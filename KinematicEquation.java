@@ -6,6 +6,28 @@ public abstract class KinematicEquation {
    private double acceleration;
    private double displacement;
    
+   // Accessor Methods for all fields
+   public double getVelocityInitial() {
+      return this.velocityInitial;
+   }
+   
+   public double getVelocityFinal() {
+      return this.velocityFinal;
+   }
+   
+   public double getTime() {
+      return this.time;
+   }
+   
+   public double getAcceleration() {
+      return this.acceleration;
+   }
+   
+   public double getDisplacement() {
+      return this.displacement;
+   }
+   
+   // Mutator methods for all fields
    public void setVelocityInitial(double velocityInitial) {
       this.velocityInitial = velocityInitial;
    }
