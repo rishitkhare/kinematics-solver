@@ -103,7 +103,12 @@ public class KinematicEquationSolver {
          }
       }
       catch (IllegalArgumentException ex) {
-         System.out.println("\t" + ex.toString().substring(ex.toString().indexOf("ERROR")));
+         if (ex.toString().contains("ERROR")) {
+            System.out.println("\t" + ex.toString().substring(ex.toString().indexOf("ERROR")));
+         }
+         else {
+            System.out.println("\t" + ex.toString());
+         }
          printEmptyLine();
       }
    }

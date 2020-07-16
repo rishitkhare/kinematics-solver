@@ -2,6 +2,10 @@
 import java.util.*;
 
 public class Air extends KinematicEquation {
+
+   private String equation = "ΔX = Vi * Δt + 0.5 * a * Δt ^ 2";
+   private double unknownValue;
+
    public Air() {
       setQuantity(4, askForQuantity("displacement", 4));
       setQuantity(0, askForQuantity("initial velocity", 0));
@@ -9,12 +13,11 @@ public class Air extends KinematicEquation {
       setQuantity(3, askForQuantity("acceleration", 3));
       System.out.println();
       if (numberOfKnownQuantities() == 4) {
-         Algebra.verifyEquality(getQuantity(4), 
-                               (getQuantity(0) * getQuantity(2)) + (0.5 * getQuantity(3) * Math.pow(getQuantity(2), 2))); 
       }
       if (numberOfKnownQuantities() < 3) {
          // If given all 4 quantities, will verify if correct
          throw new IllegalArgumentException ("ERROR: Not enough quantities");
-      }  
+      }
+//      unknownValue = Algebra.solveEquation(equation, getKnownQuantities(), getQuantities());
    }
 }

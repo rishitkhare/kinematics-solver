@@ -5,20 +5,24 @@ public abstract class KinematicEquation {
 
    // Represents whether each quantity is known {Vi, Vf, Δt, a, Δx} 
    private boolean[] knownQuantities = new boolean[5];
-   private double[] quantities = new double[5];
+   private String[] quantities = new String[5];
    
    public void setQuantity(int quantityIndex, String quantity) {
       if (! quantity.equalsIgnoreCase("?")) {
-         quantities[quantityIndex] = Double.parseDouble(quantity);
+         quantities[quantityIndex] = quantity;
       }
    }
    
-   public double getQuantity(int quantityIndex) {
+   public String getQuantity(int quantityIndex) {
       return quantities[quantityIndex];
    }
    
    public boolean[] getKnownQuantities() {
       return this.knownQuantities;
+   }
+   
+   public String[] getQuantities() {
+      return quantities;
    }
    
    public String askForQuantity(String quantity, int quantityIndex) {
@@ -27,24 +31,12 @@ public abstract class KinematicEquation {
       String input = scan.nextLine();
       if (input.equalsIgnoreCase("?")) {
          return input;
-      }
-      else if (isNumber(input)) {
+      } else if (Algebra.isNumber(input)) {
          knownQuantities[quantityIndex] = true;
          return input;
-      }
-      else {
+      } else {
          System.out.println("Invalid input: \"" + input + "\"");
          return askForQuantity(quantity, quantityIndex);
-      }
-   }
-   
-   public boolean isNumber(String input) {
-      try {
-         double answer = Double.parseDouble(input);
-         return true;
-      }
-      catch (Exception ex) {
-         return false;
       }
    }
    
