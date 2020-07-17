@@ -12,6 +12,21 @@ public class BinaryExpression extends Expression {
         this.operator = operator;
     }
 
+    public BinaryExpression(Expression operand1, String operand2, char operator) {
+        // Assuming that operand2 is a valid number
+        this(operand1, new UnaryExpression(operand2), operator);
+    }
+
+    public BinaryExpression(String operand1, Expression operand2, char operator) {
+        // Assuming that operand1 is a valid number
+        this(new UnaryExpression(operand1), operand2, operator);
+
+    }
+
+    public String toString() {
+        return (operand1.toString() + operator + operand2.toString());
+    }
+
     public Expression getOperand1() {
         return operand1;
     }

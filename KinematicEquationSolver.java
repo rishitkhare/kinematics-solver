@@ -106,6 +106,10 @@ public class KinematicEquationSolver {
          if (ex.toString().contains("ERROR")) {
             System.out.println("\t" + ex.toString().substring(ex.toString().indexOf("ERROR")));
          }
+         else if (ex.toString().contains("quit")) {
+            printGoodbyeMessage();
+            System.exit(0);
+         }
          else {
             System.out.println("\t" + ex.toString());
          }

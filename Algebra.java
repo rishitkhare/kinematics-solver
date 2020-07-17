@@ -43,8 +43,7 @@ public class Algebra {
       return expression;
    }
 
-   public static double solveEquation(Expression l, Expression r) {
-      ArrayList<String> steps = new ArrayList<String>();
+   public static double solveEquation(/*Steps showYourWork,*/ Expression l, Expression r) {
       Expression rightSide = null;
       Expression leftSide = null;
       if (l.getIsKnown() && r.getIsKnown()) {
@@ -60,6 +59,7 @@ public class Algebra {
          rightSide = r;
       }
       else {
+
          throw new IllegalArgumentException("ERROR: Both sides of equation contain an unknown value");
       }
 
@@ -122,10 +122,15 @@ public class Algebra {
 
    }
 
-
-
-
-
-   
+   public static double getPositiveQuadraticRoot(double a, double b, double c) {
+      double[] roots = new double[2];
+      roots[0] = ((b * -1) + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+      roots[1] = ((b * -1) - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
+      Arrays.sort(roots);
+      if (roots[1] > 0) {
+         return roots[1];
+      }
+      throw new IllegalArgumentException("ERROR: Both values for possible time are negative");
+   }
    
 }

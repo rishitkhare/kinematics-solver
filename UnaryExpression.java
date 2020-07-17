@@ -9,6 +9,10 @@ public class UnaryExpression extends Expression {
         }
     }
 
+    public String toString() {
+        return value;
+    }
+
     public double evaluate() {
         // Only runs when isKnown
         return Double.parseDouble(value);

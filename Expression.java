@@ -10,5 +10,7 @@ public abstract class Expression {
         return isKnown;
     }
 
+    public abstract String toString();
+
     public abstract double evaluate();
 }
