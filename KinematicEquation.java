@@ -36,13 +36,20 @@ public abstract class KinematicEquation {
       Scanner scan = new Scanner(System.in);
       System.out.print("What is the value for the " + quantity + ". Enter \"?\" if unknown: ");
       String input = scan.nextLine();
+      String[] terms = input.split(" ");
       if (input.equalsIgnoreCase("?")) {
-         return input;
-      } else if (Algebra.isNumber(input)) {
-         knownQuantities[quantityIndex] = true;
          return input;
       } else if (input.equalsIgnoreCase("quit")) {
          throw new IllegalArgumentException("quit");
+      } else if (Algebra.isNumber(terms[0])) {
+         knownQuantities[quantityIndex] = true;
+         if (terms.length == 1) {
+            return input;
+         }
+         else {
+            UnitConversion conversion = new UnitConversion(terms[1]);
+            return Double.toString(Double.parseDouble(terms[0]) * conversion.toBaseUnit());
+         }
       } else {
          System.out.println("Invalid input: \"" + input + "\"");
          return askForQuantity(quantity, quantityIndex);
