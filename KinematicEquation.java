@@ -16,13 +16,6 @@ public abstract class KinematicEquation {
    public String getQuantity(int quantityIndex) {
       return quantities[quantityIndex];
    }
-
-   public double getNumericalQuantity(int quantityIndex) {
-      if (Algebra.isNumber(quantities[quantityIndex])) {
-         return Double.parseDouble(quantities[quantityIndex]);
-      }
-      throw new IllegalArgumentException("ERROR: " + quantities[quantityIndex] + " is not a number");
-   }
    
    public boolean[] getKnownQuantities() {
       return this.knownQuantities;
@@ -41,8 +34,6 @@ public abstract class KinematicEquation {
       } else if (Algebra.isNumber(input)) {
          knownQuantities[quantityIndex] = true;
          return input;
-      } else if (input.equalsIgnoreCase("quit")) {
-         throw new IllegalArgumentException("quit");
       } else {
          System.out.println("Invalid input: \"" + input + "\"");
          return askForQuantity(quantity, quantityIndex);

@@ -13,7 +13,7 @@ public class Earth extends KinematicEquation {
       setQuantity(2, askForQuantity("time", 2));
       System.out.println();
       if (numberOfKnownQuantities() == 4) {
-         Algebra.verifyEquality(getNumericalQuantity(1), getNumericalQuantity(0) + (getNumericalQuantity(3) * getNumericalQuantity(2)));
+//         Algebra.verifyEquality(getQuantity(1), getQuantity(0) + (getQuantity(3) * getQuantity(2)));
       }
       if (numberOfKnownQuantities() < 3) {
          // If given all 4 quantities, will verify if correct
