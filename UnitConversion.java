@@ -16,9 +16,9 @@ public class UnitConversion {
     private static final String[] allValidUnits = {"ms", "s", "sec", "min", "h", "hr", "hrs", "in", "ft", "yd", "furlong", "mi", "mm", "cm", "m", "km"};
     private static final double[] convertToBase = {0.001, 1, 1, 60, 3600, 3600, 3600, 0.0254, 0.3048, 0.9144, 201.168, 1609.34, 0.001, 0.01, 1, 1000};
 
+    //technically these aren't even used in the code, but we'll leave them here in case.
     private static final String[] validTimeUnits = {"ms", "s", "sec", "min", "h", "hr", "hrs"};
     private static final double[] convertToSeconds = {0.001, 1, 1, 60, 3600, 3600, 3600};
-
     private static final String[] validDisplacementUnits = {"in", "ft", "yd", "furlong", "mi", "mm", "cm", "m", "km"};
     private static final double[] convertToMeters = {0.0254, 0.3048, 0.9144, 201.168, 1609.34, 0.001, 0.01, 1, 1000};
 
@@ -39,7 +39,7 @@ public class UnitConversion {
         //essentially does dimensional analysis
         double numerator = 1;
         double denominator = 1;
-        boolean denominatorsquared = false; //TODO : add a bool numeratorSquared for later equations
+        boolean denominatorsquared = false; //TODO : add a bool numeratorSquared for later equations (not necessary for kinematics)
 
         String numeratorUnit = unit;
         String denominatorUnit = "";
@@ -61,9 +61,6 @@ public class UnitConversion {
         if(denominatorsquared) {
             denominator = Math.pow(denominator, 2);
         }
-
-        System.out.println("numerator conversion: " + numerator);
-        System.out.println("denominator conversion: " + denominator);
 
         return numerator / denominator;
     }
