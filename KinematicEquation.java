@@ -47,8 +47,8 @@ public abstract class KinematicEquation {
             return input;
          }
          else {
-            UnitConversion conversion = new UnitConversion(terms[1]);
-            return Double.toString(Double.parseDouble(terms[0]) * conversion.toBaseUnit());
+            //UnitConversion conversion = new UnitConversion(terms[1]);
+            return Double.toString(Double.parseDouble(terms[0]));
          }
       } else {
          System.out.println("Invalid input: \"" + input + "\"");

@@ -10,7 +10,16 @@ public class KinematicEquationSolver {
                                                 {"Air", "ΔX = ViΔt + 1/2aΔt^2"},
                                                 {"Shadow", "ΔX = VfΔt - 1/2aΔt^2"} };
    public static void main(String[] args) {
-      printWelcomeMessage();
+      String unit = "";
+
+      System.out.print("convert this unit to base: ");
+      unit = SCAN.nextLine();
+      while(!unit.equalsIgnoreCase("quit")) {
+         System.out.println("to convert, multiply by " + UnitConversion.unitToConversionFactor(unit) + "\n");
+         System.out.print("convert this unit to base: ");
+         unit = SCAN.nextLine();
+      }
+      /*printWelcomeMessage();
       printEmptyLine();
       printKinematicEquations();
       printEmptyLine();
@@ -22,6 +31,7 @@ public class KinematicEquationSolver {
          input = getEquationInput(false);
       }
       printGoodbyeMessage();
+      */
    }
    
    public static void printEmptyLine() {

@@ -1,3 +1,7 @@
+//Hisham, I think this class should be static. Creating a "UnitConversion" Object every time we convert units is just messy.
+
+import java.util.*;
+
 public class UnitConversion {
     private String time;
     private String displacement;
@@ -9,6 +13,9 @@ public class UnitConversion {
     private UnitConversion displacementConversion;
     private UnitConversion timeConversion;
 
+    private static final String[] allValidUnits = {"ms", "s", "sec", "min", "h", "hr", "hrs", "in", "ft", "yd", "furlong", "mi", "mm", "cm", "m", "km"};
+    private static final double[] convertToBase = {0.001, 1, 1, 60, 3600, 3600, 3600, 0.0254, 0.3048, 0.9144, 201.168, 1609.34, 0.001, 0.01, 1, 1000};
+
     private static final String[] validTimeUnits = {"ms", "s", "sec", "min", "h", "hr", "hrs"};
     private static final double[] convertToSeconds = {0.001, 1, 1, 60, 3600, 3600, 3600};
 
@@ -17,69 +24,85 @@ public class UnitConversion {
 
     private int conversionIndex;
 
-    public UnitConversion(String type) {
-        System.out.println(type);
-        String[] fraction = type.split("/");
-        if (fraction.length == 2) {
-            if (contains(validTimeUnits, fraction[1]) && contains(validDisplacementUnits, fraction[0])) {
-                isVelocity = true;
-                displacementConversion = new UnitConversion(fraction[0]);
-                timeConversion = new UnitConversion(fraction[1]);
-            }
-            else {
-                // isAcceleration = true;
-            }
-        }
-        else if(contains(validTimeUnits, type)) {
-            isTime = true;
-            this.time = type;
-            conversionIndex = getConversionIndex(validTimeUnits, type);
-        }
-        else if (contains(validDisplacementUnits, type)) {
-            isDisplacement = true;
-            this.displacement = type;
-            conversionIndex = getConversionIndex(validDisplacementUnits, type);
-        }
-        else {
-            // will add velocity and acceleration
-            throw new IllegalArgumentException("ERROR: Invalid unit");
+    //prevents instantiation
+    private UnitConversion() {}
+
+    //Warning: as of now, nonsensical units that aren't acceleration or velocity will still be 'converted'
+
+    //takes ANY unit and finds a conversion factor to base units
+    public static double unitToConversionFactor(String unit) {
+        //if singular unit, skip the dimensional analysis //TODO : Squared units will break this system (not necessary for kinematics)
+        if(! unit.contains("/")) {
+            return singularUnitToConversionFactor(unit);
         }
 
+        //essentially does dimensional analysis
+        double numerator = 1;
+        double denominator = 1;
+        boolean denominatorsquared = false; //TODO : add a bool numeratorSquared for later equations
+
+        String numeratorUnit = unit;
+        String denominatorUnit = "";
+
+        numeratorUnit = unit.substring(0, unit.indexOf('/'));
+        denominatorUnit = unit.substring(unit.indexOf('/') + 1);
+
+        //if unit is acceleration
+        if(denominatorUnit.contains("^2")) {
+            denominatorsquared = true;
+            denominatorUnit = denominatorUnit.substring(0, denominatorUnit.length() - 2);
+        }
+
+        //actually setting the conversion factors
+        numerator = singularUnitToConversionFactor(numeratorUnit);
+        denominator = singularUnitToConversionFactor(denominatorUnit);
+
+        //acts accordingly if unit is acceleration
+        if(denominatorsquared) {
+            denominator = Math.pow(denominator, 2);
+        }
+
+        System.out.println("numerator conversion: " + numerator);
+        System.out.println("denominator conversion: " + denominator);
+
+        return numerator / denominator;
     }
 
-    public boolean contains(String[] units, String unit) {
-        for (String value : units) {
-            if (value.equalsIgnoreCase(unit)) {
+
+    //method will only work on singular units of displacement or time
+    public static double singularUnitToConversionFactor(String unit) {
+        if(! stringArrayContains(unit, allValidUnits)) {
+            throw new IllegalArgumentException("not (yet) a valid unit");
+        }
+
+        return convertToBase[stringArrayIndexOf(unit, allValidUnits)];
+    }
+
+    public String getUnits(String fullText) {
+        return fullText.substring(fullText.indexOf(" ") + 1);
+    }
+
+    //why do these methods not exist in the Arrays class???? (.contains(), .indexOf())
+
+    private static boolean stringArrayContains(String s, String[] array) {
+        for(String item : array) {
+            if(item.equals(s)) {
                 return true;
             }
         }
+
         return false;
     }
 
-    public int getConversionIndex(String[] units, String unit) {
-        for (int index = 0; index < units.length; index++) {
-            if (units[index].equalsIgnoreCase(unit)) {
-                return index;
+    private static int stringArrayIndexOf(String s, String[] array) {
+        for(int i = 0; i < array.length; i ++) {
+            if(s.equals(array[i])) {
+                return i;
             }
         }
+
         return -1;
     }
 
-    public double toBaseUnit() {
-        if (isTime) {
-            return convertToSeconds[conversionIndex];
-        }
-        else if (isDisplacement) {
-            return convertToMeters[conversionIndex];
-        }
-        else if (isVelocity) {
-            return displacementConversion.toBaseUnit() / timeConversion.toBaseUnit();
-        }
-        else {
-            // will add velocity and acceleration
-            throw new IllegalArgumentException("ERROR: Invalid unit");
-        }
-
-    }
 
 }

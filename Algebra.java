@@ -7,7 +7,9 @@ public class Algebra {
                                                       {"Δt", "2"},
                                                       {"a", "3"},
                                                       {"ΔX", "4"} };
-                                                          
+
+   //prevents instantiation
+   private Algebra() {}
 
    public static void verifyEquality(double value1, double value2) {
       if (value1 != value2) {
