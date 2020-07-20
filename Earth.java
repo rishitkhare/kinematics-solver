@@ -3,8 +3,8 @@ import java.util.*;
 
 public class Earth extends KinematicEquation {
 
-   private String equation = "Vf = Vi + a * Δt";
-   private double unknownValue;
+   public static final String equation = "Vf = Vi + aΔt";
+   public static final boolean[] quantityRange = {true, true, true, true, false};
 
    public Earth() {
       setQuantity(1, askForQuantity("final velocity", 1));
@@ -25,7 +25,28 @@ public class Earth extends KinematicEquation {
       Expression rightSide = new BinaryExpression(new UnaryExpression(getQuantity(0)),
               new BinaryExpression(new UnaryExpression(getQuantity(3)), new UnaryExpression(getQuantity(2)), '*'), '+');
 
-      unknownValue = Algebra.solveEquation(leftSide, rightSide);
-      System.out.println(unknownValue);
+      setWork(new Steps(equation));
+      if (isTimeKnown()) {
+         Algebra.solveEquation(false, this.work, leftSide, rightSide);
+      }
+      else {
+         Algebra.solveEquation(true, this.work, leftSide, rightSide);
+      }
+   }
+
+   public Earth(boolean[] knownQuantities, String[] quantities) {
+      setKnownQuantities(knownQuantities);
+      setQuantities(quantities);
+      Expression leftSide = new UnaryExpression(getQuantity(1));
+      Expression rightSide = new BinaryExpression(new UnaryExpression(getQuantity(0)),
+              new BinaryExpression(new UnaryExpression(getQuantity(3)), new UnaryExpression(getQuantity(2)), '*'), '+');
+
+      setWork(new Steps(equation));
+      if (isTimeKnown()) {
+         Algebra.solveEquation(false, this.work, leftSide, rightSide);
+      }
+      else {
+         Algebra.solveEquation(true, this.work, leftSide, rightSide);
+      }
    }
 }

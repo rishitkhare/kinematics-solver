@@ -24,7 +24,7 @@ public class BinaryExpression extends Expression {
     }
 
     public String toString() {
-        return (operand1.toString() + operator + operand2.toString());
+        return (operand1.toString() + " " + operator + " " + operand2.toString());
     }
 
     public Expression getOperand1() {

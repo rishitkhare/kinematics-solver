@@ -3,8 +3,8 @@ import java.util.*;
 
 public class Air extends KinematicEquation {
 
-   private String equation = "ΔX = Vi * Δt + 0.5 * a * Δt ^ 2";
-   private double unknownValue;
+   public static final String equation = "ΔX = Vi * Δt + 0.5 * a * Δt ^ 2";
+   public static final boolean[] quantityRange = {true, false, true, true, true};
 
    public Air() {
       setQuantity(4, askForQuantity("displacement", 4));
@@ -27,14 +27,28 @@ public class Air extends KinematicEquation {
       //Expression halfATimeSquared = new BinaryExpression(halfA, timeSquared, '*');
       Expression rightSide = new BinaryExpression(new BinaryExpression(new UnaryExpression(getQuantity(0)), new UnaryExpression(getQuantity(2)), '*'), new BinaryExpression(new BinaryExpression("0.5", new UnaryExpression(getQuantity(3)), '*'), new BinaryExpression(new UnaryExpression(getQuantity(2)), "2", '^'), '*'), '+');
 
+      setWork(new Steps(equation));
 
       if (!getKnownQuantities()[2]) {
-         unknownValue = Algebra.getPositiveQuadraticRoot(0.5 * getNumericalQuantity(3), getNumericalQuantity(0), -1 * getNumericalQuantity(4));
+         Algebra.getPositiveQuadraticRoot(work, 0.5 * getNumericalQuantity(3), getNumericalQuantity(0), -1 * getNumericalQuantity(4));
       }
       else {
-         unknownValue = Algebra.solveEquation(leftSide, rightSide);
+         Algebra.solveEquation(false, work, leftSide, rightSide);
       }
-      System.out.println(unknownValue);
-//      unknownValue = Algebra.solveEquation(equation, getKnownQuantities(), getQuantities());
+   }
+
+   public Air(boolean[] knownQuantities, String[] quantities) {
+      setKnownQuantities(knownQuantities);
+      super.setQuantities(quantities);
+      Expression leftSide = new UnaryExpression(getQuantity(4));
+      Expression rightSide = new BinaryExpression(new BinaryExpression(new UnaryExpression(getQuantity(0)), new UnaryExpression(getQuantity(2)), '*'), new BinaryExpression(new BinaryExpression("0.5", new UnaryExpression(getQuantity(3)), '*'), new BinaryExpression(new UnaryExpression(getQuantity(2)), "2", '^'), '*'), '+');
+
+      setWork(new Steps(equation));
+      if (!getKnownQuantities()[2]) {
+         Algebra.getPositiveQuadraticRoot(work, 0.5 * getNumericalQuantity(3), getNumericalQuantity(0), -1 * getNumericalQuantity(4));
+      }
+      else {
+         Algebra.solveEquation(false, work, leftSide, rightSide);
+      }
    }
 }

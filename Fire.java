@@ -3,8 +3,8 @@ import java.util.*;
 
 public class Fire extends KinematicEquation {
 
-   private String equation = "Vf ^ 2 = Vi ^ 2 + 2 * a * ΔX";
-   private double unknownValue;
+   public static final String equation = "Vf ^ 2 = Vi ^ 2 + 2 * a * ΔX";
+   public static final boolean[] quantityRange = {true, true, false, true, true};
 
    public Fire() {
       setQuantity(1, askForQuantity("final velocity", 1));
@@ -18,14 +18,23 @@ public class Fire extends KinematicEquation {
       if (numberOfKnownQuantities() < 3) {
          // If given all 4 quantities, will verify if correct
          throw new IllegalArgumentException ("ERROR: Not enough quantities");
-      } 
-//      Algebra.solveEquation(equation, getKnownQuantities(), getQuantities());
+      }
 
       Expression leftSide = new BinaryExpression(new UnaryExpression(getQuantity(1)), new UnaryExpression("2"), '^');
 
       Expression rightSide = new BinaryExpression(new BinaryExpression(new UnaryExpression(getQuantity(0)), new UnaryExpression("2"), '^'), new BinaryExpression(new UnaryExpression(getQuantity(3)), new BinaryExpression(new UnaryExpression(getQuantity(4)), new UnaryExpression("2"), '*'), '*'), '+');
 
-      unknownValue = Algebra.solveEquation(leftSide, rightSide);
-      System.out.println(unknownValue);
+      setWork(new Steps(equation));
+      Algebra.solveEquation(false, this.work, leftSide, rightSide);
+   }
+   public Fire(boolean[] knownQuantities, String[] quantities) {
+      setKnownQuantities(knownQuantities);
+      setQuantities(quantities);
+      Expression leftSide = new BinaryExpression(new UnaryExpression(getQuantity(1)), new UnaryExpression("2"), '^');
+
+      Expression rightSide = new BinaryExpression(new BinaryExpression(new UnaryExpression(getQuantity(0)), new UnaryExpression("2"), '^'), new BinaryExpression(new UnaryExpression(getQuantity(3)), new BinaryExpression(new UnaryExpression(getQuantity(4)), new UnaryExpression("2"), '*'), '*'), '+');
+
+      setWork(new Steps(equation));
+      Algebra.solveEquation(false, this.work, leftSide, rightSide);
    }
 }

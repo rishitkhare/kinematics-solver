@@ -1,11 +1,13 @@
 // Superclass represents generic blueprint for a kinematic equation
 import java.util.*;
 
-public abstract class KinematicEquation {
+public class KinematicEquation {
 
-   // Represents whether each quantity is known {Vi, Vf, Δt, a, Δx} 
+   // Represents whether each quantity is known {Vi, Vf, Δt, a, ΔX}
    private boolean[] knownQuantities = new boolean[5];
-   private String[] quantities = new String[5];
+   private String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"};
+
+   protected Steps work;
    
    public void setQuantity(int quantityIndex, String quantity) {
       if (! quantity.equalsIgnoreCase("?")) {
@@ -47,7 +49,10 @@ public abstract class KinematicEquation {
             return input;
          }
          else {
-            return Double.toString(Double.parseDouble(terms[0]) * UnitConversion.unitToConversionFactor(terms[1]));
+            if (quantityIndex == 0) {
+               quantityIndex = 1;
+            }
+            return Double.toString(Double.parseDouble(terms[0]) * UnitConversion.unitToConversionFactor(terms[1], quantityIndex));
          }
       } else {
          System.out.println("Invalid input: \"" + input + "\"");
@@ -63,5 +68,35 @@ public abstract class KinematicEquation {
          }
       }
       return count;
-   } 
+   }
+
+   public void setWork(Steps work) {
+      this.work = work;
+   }
+
+   public void setKnownQuantities(boolean[] knownQuantities) {
+      this.knownQuantities = knownQuantities;
+   }
+
+   public void setQuantities(String[] quantities) {
+      this.quantities = quantities;
+   }
+
+
+   public String getAnswer() {
+      return work.getLastStep();
+   }
+
+   public int getMissingQuantityIndex() {
+      for (int quantityIndex = 0; quantityIndex < knownQuantities.length; quantityIndex++) {
+         if (knownQuantities[quantityIndex] == false) {
+            return quantityIndex;
+         }
+      }
+      throw new IllegalArgumentException("ERROR: All values are known");
+   }
+
+   public boolean isTimeKnown() {
+      return knownQuantities[2];
+   }
 }

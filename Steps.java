@@ -13,7 +13,7 @@ public class Steps {
         steps.add(newStep);
     }
 
-    public String getAllSteps() {
+    public String toString() {
         String output = steps.get(0);
 
         for(int i = 1; i < steps.size(); i ++) {
@@ -21,6 +21,10 @@ public class Steps {
         }
 
         return output;
+    }
+
+    public String getLastStep() {
+        return steps.get(steps.size() - 1);
     }
 
 }

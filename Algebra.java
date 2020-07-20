@@ -45,7 +45,10 @@ public class Algebra {
       return expression;
    }
 
-   public static double solveEquation(/*Steps showYourWork,*/ Expression l, Expression r) {
+   public static void solveEquation(boolean isTime, Steps showYourWork, Expression l, Expression r) {
+
+      showYourWork.addStep(l.toString() + " = " + r.toString());
+
       Expression rightSide = null;
       Expression leftSide = null;
       if (l.getIsKnown() && r.getIsKnown()) {
@@ -64,6 +67,7 @@ public class Algebra {
 
          throw new IllegalArgumentException("ERROR: Both sides of equation contain an unknown value");
       }
+      showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
 
       while (leftSide instanceof BinaryExpression) {
          BinaryExpression binaryLeftSide = (BinaryExpression) leftSide;
@@ -119,20 +123,30 @@ public class Algebra {
             throw new IllegalArgumentException("ERROR: Invalid operator " + operator);
          }
 
+         if (rightSide.evaluate() >= 0 && isTime) {
+            showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
+         }
+         else {
+            throw new IllegalArgumentException("ERROR: Time cannot be negative");
+         }
+
       }
-      return rightSide.evaluate();
 
    }
 
-   public static double getPositiveQuadraticRoot(double a, double b, double c) {
+   public static void getPositiveQuadraticRoot(Steps showYourWork, double a, double b, double c) {
+      showYourWork.addStep("Δt = (-b ± √(b^2 + 4ac) / 2a");
+      showYourWork.addStep("Δt = (" + (-1 * b) + " ± √(" + Math.pow(b, 2) + " + " + (4 * a * c) + ") / " + (2 * a));
       double[] roots = new double[2];
       roots[0] = ((b * -1) + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
       roots[1] = ((b * -1) - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
       Arrays.sort(roots);
       if (roots[1] > 0) {
-         return roots[1];
+         showYourWork.addStep("Δt = " + roots[1]);
       }
-      throw new IllegalArgumentException("ERROR: Both values for possible time are negative");
+      else {
+         throw new IllegalArgumentException("ERROR: Both values for possible time are negative");
+      }
    }
    
 }
