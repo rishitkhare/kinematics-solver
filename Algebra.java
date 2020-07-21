@@ -2,12 +2,6 @@ import java.util.*;
 
 public class Algebra {
 
-   public static final String[][] QUANTITY_INDEXES = { {"Vi", "0"},
-                                                      {"Vf", "1"},
-                                                      {"Δt", "2"},
-                                                      {"a", "3"},
-                                                      {"ΔX", "4"} };
-
    //prevents instantiation
    private Algebra() {}
 
@@ -36,15 +30,6 @@ public class Algebra {
       }
    }
 
-   
-   public static ArrayList<String> getExpression(int operandIndex, ArrayList<String> equationSide) {
-      ArrayList<String> expression = new ArrayList<String>();
-      for (int index = operandIndex - 1; index <= operandIndex + 1; index++) {
-         expression.add(equationSide.get(index));
-      }
-      return expression;
-   }
-
    public static void solveEquation(boolean isTime, Steps showYourWork, Expression l, Expression r) {
 
       showYourWork.addStep(l.toString() + " = " + r.toString());
@@ -52,7 +37,7 @@ public class Algebra {
       Expression rightSide = null;
       Expression leftSide = null;
       if (l.getIsKnown() && r.getIsKnown()) {
-//         Algebra.verifyEquality(l, r);
+         Algebra.verifyEquality(l.evaluate(), r.evaluate());
       }
       else if (l.getIsKnown()) {
          // leftSide is known, rightSide is NOT known
@@ -64,7 +49,6 @@ public class Algebra {
          rightSide = r;
       }
       else {
-
          throw new IllegalArgumentException("ERROR: Both sides of equation contain an unknown value");
       }
       showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
@@ -122,21 +106,18 @@ public class Algebra {
          else {
             throw new IllegalArgumentException("ERROR: Invalid operator " + operator);
          }
-
-         if (rightSide.evaluate() >= 0 && isTime) {
-            showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
-         }
-         else {
+         if (rightSide.evaluate() <= 0 && isTime) {
             throw new IllegalArgumentException("ERROR: Time cannot be negative");
          }
-
+         else {
+            showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
+         }
       }
-
    }
 
    public static void getPositiveQuadraticRoot(Steps showYourWork, double a, double b, double c) {
-      showYourWork.addStep("Δt = (-b ± √(b^2 + 4ac) / 2a");
-      showYourWork.addStep("Δt = (" + (-1 * b) + " ± √(" + Math.pow(b, 2) + " + " + (4 * a * c) + ") / " + (2 * a));
+      showYourWork.addStep("Δt = (-b ± √(b^2 - 4ac) / 2a");
+      showYourWork.addStep("Δt = (" + (-1 * b) + " ± √(" + Math.pow(b, 2) + " - " + (4 * a * c) + ") / " + (2 * a));
       double[] roots = new double[2];
       roots[0] = ((b * -1) + Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
       roots[1] = ((b * -1) - Math.sqrt(Math.pow(b, 2) - 4 * a * c)) / (2 * a);
@@ -148,5 +129,4 @@ public class Algebra {
          throw new IllegalArgumentException("ERROR: Both values for possible time are negative");
       }
    }
-   
 }

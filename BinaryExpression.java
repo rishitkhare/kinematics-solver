@@ -1,6 +1,5 @@
 public class BinaryExpression extends Expression {
 
-    private String value;
     private Expression operand1;
     private Expression operand2;
     private char operator;
@@ -24,7 +23,18 @@ public class BinaryExpression extends Expression {
     }
 
     public String toString() {
-        return (operand1.toString() + " " + operator + " " + operand2.toString());
+        if (operand1.getIsKnown() && operand2.getIsKnown()) {
+            return Double.toString(evaluate());
+        }
+        else if (operand1.getIsKnown()) {
+            return Double.toString(operand1.evaluate()) + " " + operator + " " + operand2.toString();
+        }
+        else if (operand2.getIsKnown()) {
+            return operand1.toString() + " " + operator + " " + Double.toString(operand2.evaluate());
+        }
+        else {
+            return ("(" + operand1.toString() + " " + operator + " " + operand2.toString() + ")");
+        }
     }
 
     public Expression getOperand1() {

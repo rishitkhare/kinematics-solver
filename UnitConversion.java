@@ -1,5 +1,3 @@
-//Hisham, I think this class should be static. Creating a "UnitConversion" Object every time we convert units is just messy.
-
 import java.util.*;
 
 public class UnitConversion {
@@ -7,25 +5,21 @@ public class UnitConversion {
     private UnitConversion displacementConversion;
     private UnitConversion timeConversion;
 
-
     private static final String[] allValidUnits = {"ms", "s", "sec", "min", "h", "hr", "hrs", "in", "ft", "yd", "fur", "mi", "mm", "cm", "m", "km"};
     private static final double[] convertToBase = {0.001, 1, 1, 60, 3600, 3600, 3600, 0.0254, 0.3048, 0.9144, 201.168, 1609.34, 0.001, 0.01, 1, 1000};
 
-    private static final String[][] allValidUnitsAGAIN = { {"in", "ft", "yd", "fm", "cbl", "furlong", "mi", "nmi", "nm", "mm", "cm", "m", "km", "au", "lyr"},
+    private static final String[][] allValidUnitsAGAIN = { {"in", "ft", "yd", "ftbl", "fm", "cbl", "furlong", "mi", "nmi", "nm", "mm", "cm", "m", "km", "au", "lyr"},
                                                            {"ps", "ms", "jiffy", "s", "sec", "min", "h", "hr", "hrs", "day", "wk", "ftn", "mo", "yr"} };
 
-    //technically these aren't even used in the code, but we'll leave them here in case.
     private static final String[] validTimeUnits = {"ps", "ms", "jiffy", "s", "sec", "min", "h", "hr", "hrs", "day", "wk", "ftn", "mo", "yr"};
     private static final double[] convertToSeconds = {1E-12, 0.001, 0.01, 1, 1, 60, 3600, 3600, 3600, 86400, 604800, 1209600, 2.628E6, 3.154E7};
-    private static final String[] validDisplacementUnits = {"in", "ft", "yd", "fm", "cbl", "furlong", "mi", "nmi", "nm", "mm", "cm", "m", "km", "au", "lyr"};
-    private static final double[] convertToMeters = {0.0254, 0.3048, 0.9144, 1.8288, 185.2, 201.168, 1609.34, 1852, 1E-9, 0.001, 0.01, 1, 1000, 1.496E11, 9.461E15};
+    private static final String[] validDisplacementUnits = {"in", "ft", "yd", "ftbl", "fm", "cbl", "furlong", "mi", "nmi", "nm", "mm", "cm", "m", "km", "au", "lyr"};
+    private static final double[] convertToMeters = {0.0254, 0.3048, 0.9144, 91.44, 1.8288, 185.2, 201.168, 1609.34, 1852, 1E-9, 0.001, 0.01, 1, 1000, 1.496E11, 9.461E15};
 
     private int conversionIndex;
 
     //prevents instantiation
     private UnitConversion() {}
-
-    //Warning: as of now, nonsensical units that aren't acceleration or velocity will still be 'converted'
 
     //takes ANY unit and finds a conversion factor to base units
     public static double unitToConversionFactor(String unit, int quantityIndex) {
@@ -65,13 +59,11 @@ public class UnitConversion {
         return numerator / denominator;
     }
 
-
     //method will only work on singular units of displacement or time
     private static double singularUnitToConversionFactor(String unit) {
         if(! stringArrayContains(unit, allValidUnits)) {
             throw new IllegalArgumentException("not (yet) a valid unit");
         }
-
         return convertToBase[stringArrayIndexOf(unit, allValidUnits)];
     }
 
@@ -87,7 +79,6 @@ public class UnitConversion {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -134,6 +125,7 @@ public class UnitConversion {
         String[][] validDisplacementUnits = { {"inches", "in"},
                                               {"feet", "ft"},
                                               {"yards", "yd"},
+                                              {"football fields", "ftbl"},
                                               {"fathoms", "fm"},
                                               {"cable length", "cbl"},
                                               {"furlongs", "fur"},

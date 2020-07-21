@@ -8,7 +8,12 @@ public class KinematicEquation {
    private String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"};
 
    protected Steps work;
-   
+
+   public void doAlgebra() {
+      //should never be called from a generic object
+      //(overidden by subclasses)
+   }
+
    public void setQuantity(int quantityIndex, String quantity) {
       if (! quantity.equalsIgnoreCase("?")) {
          quantities[quantityIndex] = quantity;
@@ -34,32 +39,6 @@ public class KinematicEquation {
       return quantities;
    }
    
-   public String askForQuantity(String quantity, int quantityIndex) {
-      Scanner scan = new Scanner(System.in);
-      System.out.print("What is the value for the " + quantity + ". Enter \"?\" if unknown: ");
-      String input = scan.nextLine();
-      String[] terms = input.split(" ");
-      if (input.equalsIgnoreCase("?")) {
-         return input;
-      } else if (input.equalsIgnoreCase("quit")) {
-         throw new IllegalArgumentException("quit");
-      } else if (Algebra.isNumber(terms[0])) {
-         knownQuantities[quantityIndex] = true;
-         if (terms.length == 1) {
-            return input;
-         }
-         else {
-            if (quantityIndex == 0) {
-               quantityIndex = 1;
-            }
-            return Double.toString(Double.parseDouble(terms[0]) * UnitConversion.unitToConversionFactor(terms[1], quantityIndex));
-         }
-      } else {
-         System.out.println("Invalid input: \"" + input + "\"");
-         return askForQuantity(quantity, quantityIndex);
-      }
-   }
-   
    public int numberOfKnownQuantities() {
       int count = 0;
       for (int index = 0; index < knownQuantities.length; index++) {
@@ -82,7 +61,6 @@ public class KinematicEquation {
       this.quantities = quantities;
    }
 
-
    public String getAnswer() {
       return work.getLastStep();
    }
@@ -98,5 +76,19 @@ public class KinematicEquation {
 
    public boolean isTimeKnown() {
       return knownQuantities[2];
+   }
+
+   public String getWork() {
+      return work.toString();
+   }
+
+   public void checkNumberOfQuantities(int quantities) {
+      if (numberOfKnownQuantities() == 4) {
+         Algebra.verifyEquality(getNumericalQuantity(4), 0.5 * (getNumericalQuantity(0) + getNumericalQuantity(1)) * getNumericalQuantity(2));
+      }
+      if (numberOfKnownQuantities() < 3) {
+         // If given all 4 quantities, will verify if correct
+         throw new IllegalArgumentException ("ERROR: Not enough quantities");
+      }
    }
 }

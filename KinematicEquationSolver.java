@@ -9,6 +9,15 @@ public class KinematicEquationSolver {
                                                 {"Fire", "Vf^2 = Vi^2 + 2aΔX"}, 
                                                 {"Air", "ΔX = ViΔt + 1/2aΔt^2"},
                                                 {"Shadow", "ΔX = VfΔt - 1/2aΔt^2"} };
+
+   public static final String[] QUANTITY_NAMES = {"initial velocity", "final velocity", "time", "acceleration", "displacement"};
+
+   public static final int[][] EQUATION_ASK_ORDER = { {1, 0, 3, 2}, // Earth
+                                                      {4, 1, 0, 2}, // Water
+                                                      {1, 0, 3, 4}, // Fire
+                                                      {4, 0, 2, 3}, // Air
+                                                      {4, 1, 2, 3} }; // Shadow
+
    public static void main(String[] args) {
       System.out.println(UnitConversion.getValidUnits());
       printWelcomeMessage();
@@ -23,7 +32,6 @@ public class KinematicEquationSolver {
          input = getEquationInput(false);
       }
       printGoodbyeMessage();
-
    }
    
    public static void printEmptyLine() {
@@ -66,46 +74,56 @@ public class KinematicEquationSolver {
       printEmptyLine();
       System.out.print("What can I help you with? ");
       String answer = "";
+
       return SCAN.nextLine();
    }
    
    public static void processInput(String input) {
       try {
          KinematicEquation solution = null;
+         boolean[] knowns = new boolean[5];
+         String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"};
          if (input.equalsIgnoreCase("solve")) {
             solution = new KinematicEquation();
-            solveEquation(solution);
+            solveEquation(solution, knowns, quantities);
             return;
          }
          else if (input.equalsIgnoreCase("1") || input.equalsIgnoreCase("Earth")) {
-            // runEarthEquation();
             System.out.println(displayKinematicEquation(0));
-            solution = new Earth();
+            setQuantities(quantities, knowns, 0);
+            solution = new Earth(knowns, quantities);
          }
          else if (input.equalsIgnoreCase("2") || input.equalsIgnoreCase("Water")) {
-            // runWaterEquation();
             System.out.println(displayKinematicEquation(1));
-            solution = new Water();
+            setQuantities(quantities, knowns, 1);
+            solution = new Water(knowns, quantities);
          }
          else if (input.equalsIgnoreCase("3") || input.equalsIgnoreCase("Fire")) {
-            // runFireEquation();
             System.out.println(displayKinematicEquation(2));
-            solution = new Fire();
+            setQuantities(quantities, knowns, 2);
+            solution = new Fire(knowns, quantities);
          }
          else if (input.equalsIgnoreCase("4") || input.equalsIgnoreCase("Air")) {
-            // runAirEquation();
             System.out.println(displayKinematicEquation(3));
-            solution = new Air();
+            setQuantities(quantities, knowns, 3);
+            solution = new Air(knowns, quantities);
          }
          else if (input.equalsIgnoreCase("5") || input.equalsIgnoreCase("Shadow")) {
-            // runShadowEquation();
             System.out.println(displayKinematicEquation(4));
-            solution = new Shadow();
+            setQuantities(quantities, knowns, 4);
+            solution = new Shadow(knowns, quantities);
          }
          else {
-            System.out.println("\t" + "Invalid input: \"" + input + "\"");
+            throw new IllegalArgumentException("\tERROR: " + "Invalid input: \"" + input + "\"");
          }
+
+         solution.doAlgebra();
          System.out.println(solution.getAnswer());
+         System.out.print("Enter \"w\" to display the work for this problem. Press \"enter\" to continue: ");
+         String answer = SCAN.nextLine();
+         if (answer.equalsIgnoreCase("w")) {
+            System.out.println(solution.getWork());
+         }
       }
       catch (IllegalArgumentException ex) {
          if (ex.toString().contains("ERROR")) {
@@ -122,13 +140,13 @@ public class KinematicEquationSolver {
       }
    }
 
-   public static void solveEquation(KinematicEquation generalEquation) {
+   public static void solveEquation(KinematicEquation generalEquation, boolean[] knowns, String[] quantities) {
       Steps work;
-      generalEquation.setQuantity(0, generalEquation.askForQuantity("initial velocity", 0));
-      generalEquation.setQuantity(1, generalEquation.askForQuantity("final velocity", 1));
-      generalEquation.setQuantity(2, generalEquation.askForQuantity("time", 2));
-      generalEquation.setQuantity(3, generalEquation.askForQuantity("acceleration", 3));
-      generalEquation.setQuantity(4, generalEquation.askForQuantity("displacement", 4));
+      generalEquation.setQuantity(0, askForQuantity(quantities, "initial velocity", knowns,0));
+      generalEquation.setQuantity(1, askForQuantity(quantities, "final velocity", knowns, 1));
+      generalEquation.setQuantity(2, askForQuantity(quantities, "time", knowns,2));
+      generalEquation.setQuantity(3, askForQuantity(quantities, "acceleration", knowns,3));
+      generalEquation.setQuantity(4, askForQuantity(quantities, "displacement", knowns,4));
       if (generalEquation.numberOfKnownQuantities() < 3) {
          throw new IllegalArgumentException("ERROR: Must have at least 3 quantities");
       }
@@ -138,13 +156,14 @@ public class KinematicEquationSolver {
       else if ((generalEquation.numberOfKnownQuantities() == 4)) {
          int unknownIndex = generalEquation.getMissingQuantityIndex();
          if (unknownIndex != 4) {
-            generalEquation = new Earth(generalEquation.getKnownQuantities(), generalEquation.getQuantities());
-            System.out.println(generalEquation.getAnswer());
+            generalEquation = (Earth) new Earth(generalEquation.getKnownQuantities(), generalEquation.getQuantities());
          }
          else {
             generalEquation = new Water(generalEquation.getKnownQuantities(), generalEquation.getQuantities());
-            System.out.println(generalEquation.getAnswer());
          }
+
+         generalEquation.doAlgebra();
+         System.out.println(generalEquation.getAnswer());
       }
       else { // knows all 5 values
          //verifies two equations to verify all five values
@@ -177,5 +196,47 @@ public class KinematicEquationSolver {
          }
       }
 
+   }
+
+   public static String askForQuantity(String[] quantities, String quantity, boolean[] knowns, int quantityIndex) {
+      System.out.print("What is the value for the " + quantity + ". Enter \"?\" if unknown. Enter \"u\" to display possible units and proper abbreviations: ");
+      String input = SCAN.nextLine();
+      if(input.equalsIgnoreCase("u")) {
+         System.out.println(UnitConversion.getValidUnits());
+         input = askForQuantity(quantities, quantity, knowns, quantityIndex);
+      }
+
+      //unit conversion
+      String[] terms = input.split(" ");
+
+
+      if (input.equalsIgnoreCase("?")) {
+         return quantities[quantityIndex];
+      } else if (input.equalsIgnoreCase("quit")) {
+         throw new IllegalArgumentException("quit");
+      } else if (Algebra.isNumber(terms[0])) {
+         knowns[quantityIndex] = true;
+
+         if (terms.length == 1) {
+            return terms[0].toString();
+         }
+         else {
+
+            if (quantityIndex == 0) {
+               quantityIndex = 1;
+            }
+            return Double.toString(Double.parseDouble(terms[0]) * UnitConversion.unitToConversionFactor(terms[1], quantityIndex));
+         }
+      } else {
+         System.out.println("Invalid input: \"" + input + "\"");
+         return askForQuantity(quantities, quantity, knowns, quantityIndex);
+      }
+   }
+
+   public static void setQuantities(String[] quantities, boolean[] knowns, int row) {
+      for (int index = 0; index < EQUATION_ASK_ORDER[row].length; index++) {
+         int quantityIndex = EQUATION_ASK_ORDER[row][index];
+         quantities[quantityIndex] = askForQuantity(quantities, QUANTITY_NAMES[quantityIndex], knowns, quantityIndex);
+      }
    }
 }

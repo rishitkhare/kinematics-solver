@@ -1,5 +1,4 @@
 public abstract class Expression {
-
     private boolean isKnown;
 
     public void setIsKnown(boolean isKnown) {

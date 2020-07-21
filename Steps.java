@@ -5,7 +5,6 @@ public class Steps {
 
     public Steps(String baseEquation) {
         steps = new ArrayList<String>();
-
         steps.add(baseEquation);
     }
 
@@ -19,12 +18,10 @@ public class Steps {
         for(int i = 1; i < steps.size(); i ++) {
             output += "\n" + steps.get(i);
         }
-
         return output;
     }
 
     public String getLastStep() {
         return steps.get(steps.size() - 1);
     }
-
 }
