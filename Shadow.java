@@ -1,8 +1,10 @@
 public class Shadow extends KinematicEquation {
 
    public static final String equation = "ΔX = VfΔt - 1/2aΔt^2";
+   public static final boolean[] presentQuantities = {false, true, true, true, true};
 
    public Shadow(boolean[] knownQuantities, String[] quantities) {
+      super.absentQuantityIndex = 0;
       setKnownQuantities(knownQuantities);
       setQuantities(quantities);
 
@@ -20,7 +22,9 @@ public class Shadow extends KinematicEquation {
          Algebra.getPositiveQuadraticRoot(work, -0.5 * getNumericalQuantity(3), getNumericalQuantity(1), -1 * getNumericalQuantity(4));
       }
       else {
-         Algebra.solveEquation(false, this.work, leftSide, rightSide);
+         Algebra.solveEquation(false, this.work, leftSide, rightSide, getMissingQuantityIndex());
       }
+
+      setQuantity(getMissingQuantityIndex(), this.work.getNumericalAnswer()); //adds answer to array and updates knowns
    }
 }

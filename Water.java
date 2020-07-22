@@ -1,8 +1,10 @@
 public class Water extends KinematicEquation {
 
    public static final String equation = "ΔX = 1/2(Vf + Vi)Δt";
+   public static final boolean[] presentQuantities = {true, true, true, false, true};
 
    public Water(boolean[] knownQuantities, String[] quantities) {
+      super.absentQuantityIndex = 3;
       setKnownQuantities(knownQuantities);
       setQuantities(quantities);
 
@@ -14,14 +16,13 @@ public class Water extends KinematicEquation {
 
    @Override
    public void doAlgebra() {
-
       setWork(new Steps(equation));
-
       if (isTimeKnown()) {
-         Algebra.solveEquation(false, this.work, leftSide, rightSide);
+         Algebra.solveEquation(false, this.work, leftSide, rightSide, getMissingQuantityIndex());
       }
       else {
-         Algebra.solveEquation(true, this.work, leftSide, rightSide);
+         Algebra.solveEquation(true, this.work, leftSide, rightSide, getMissingQuantityIndex());
       }
+      setQuantity(getMissingQuantityIndex(), this.work.getNumericalAnswer()); //adds answer to array and updates knowns
    }
 }

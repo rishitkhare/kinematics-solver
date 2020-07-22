@@ -3,8 +3,10 @@
 public class Fire extends KinematicEquation {
 
    public static final String equation = "Vf^2 = Vi^2 + 2aΔX";
+   public static final boolean[] presentQuantities = {true, true, false, true, true};
 
    public Fire(boolean[] knownQuantities, String[] quantities) {
+      super.absentQuantityIndex = 2;
       setKnownQuantities(knownQuantities);
       setQuantities(quantities);
 
@@ -18,6 +20,8 @@ public class Fire extends KinematicEquation {
    public void doAlgebra() {
 
       setWork(new Steps(equation));
-      Algebra.solveEquation(false, this.work, leftSide, rightSide);
+      Algebra.solveEquation(false, this.work, leftSide, rightSide, getMissingQuantityIndex());
+
+      setQuantity(getMissingQuantityIndex(), this.work.getNumericalAnswer()); //adds answer to array and updates knowns
    }
 }

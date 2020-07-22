@@ -25,7 +25,7 @@
 
 
 // Superclass represents generic blueprint for a kinematic equation
-import java.util.*;
+
 
 public class KinematicEquation {
 
@@ -38,6 +38,15 @@ public class KinematicEquation {
    protected Expression leftSide;
    protected Expression rightSide;
 
+   protected int absentQuantityIndex = -1;
+
+   public KinematicEquation(){}
+
+   public KinematicEquation(boolean[] knowns, String[] values) {
+      this.knownQuantities = knowns;
+      this.quantities = values;
+   }
+
    //method for actually solving equation
    public void doAlgebra() {
       //should never be called from a generic KinematicEquation object
@@ -48,9 +57,11 @@ public class KinematicEquation {
    //*** ACCESSORS ***\\
 
    //accessor for work
-   public String getWork() {
+   public String getWorkString() {
       return work.toString();
    }
+
+   public Steps getWork() { return work; }
 
    //accessor method for all quantities
    public String getQuantity(int quantityIndex) {
@@ -63,6 +74,14 @@ public class KinematicEquation {
          return Double.parseDouble(quantities[quantityIndex]);
       }
       throw new IllegalArgumentException("ERROR: " + quantities[quantityIndex] + " is not a number");
+   }
+
+   public Expression getLeftSide() {
+      return this.leftSide;
+   }
+
+   public Expression getRightSide() {
+      return this.rightSide;
    }
 
    //accessor for knownQuantities
@@ -79,7 +98,7 @@ public class KinematicEquation {
    public int numberOfKnownQuantities() {
       int count = 0;
       for (int index = 0; index < knownQuantities.length; index++) {
-         if (knownQuantities[index]) {
+         if (knownQuantities[index] && index != absentQuantityIndex) {
             count++;
          }
       }
@@ -124,7 +143,6 @@ public class KinematicEquation {
 
    //*** OTHER METHODS ***\\
 
-   //TODO: add units in steps class to final answer
    //returns the answer by getting the last step of the work (ex: Vi = 5.0)
    public String getAnswer() {
       return work.getLastStep();
@@ -133,7 +151,7 @@ public class KinematicEquation {
    //checks for the first unknown on the list
    public int getMissingQuantityIndex() {
       for (int quantityIndex = 0; quantityIndex < knownQuantities.length; quantityIndex++) {
-         if (knownQuantities[quantityIndex] == false) {
+         if (knownQuantities[quantityIndex] == false && quantityIndex != absentQuantityIndex) {
             return quantityIndex;
          }
       }
@@ -149,7 +167,12 @@ public class KinematicEquation {
    public void checkNumberOfQuantities(int quantities) {
       if (numberOfKnownQuantities() == 4) {
          // if all four quantities of equation are known, then throw error (error may differ based on correctness of values given)
-         Algebra.verifyEquality(leftSide.evaluate(), rightSide.evaluate());
+         if (Algebra.isEqualEquation(leftSide, rightSide)) {
+            throw new IllegalArgumentException("ERROR: Equation length - All quantities are known");
+         }
+         else {
+            throw new IllegalArgumentException("ERROR: Equation length - Unequal equation");
+         }
       }
       if (numberOfKnownQuantities() < 3) {
          // if there isn't enough information, throw error

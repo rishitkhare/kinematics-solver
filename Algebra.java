@@ -2,18 +2,13 @@ import java.util.*;
 
 public class Algebra {
 
+   public static final String[] standardUnits = {"m/s", "m/s", "s", "m/s^2", "m"};
+
    //prevents instantiation
    private Algebra() {}
 
-
-   //TODO: make this method return a boolean and change uses of this method across the program.
-   public static void verifyEquality(double value1, double value2) {
-      if (value1 != value2) {
-         throw new IllegalArgumentException("ERROR: Unequal equation");
-      }
-      else {
-         throw new IllegalArgumentException("ERROR: Umm you already know all the quantities");
-      }
+   public static boolean isEqualEquation(Expression leftSide, Expression rightSide) {
+      return leftSide.evaluate() == rightSide.evaluate();
    }
 
    // checks if a String can be parsed as Double
@@ -28,7 +23,7 @@ public class Algebra {
    }
 
    // given a left and right side of an equation, a Steps object, and if the unknown is time (for special cases)
-   public static void solveEquation(boolean isTime, Steps showYourWork, Expression l, Expression r) {
+   public static void solveEquation(boolean isTime, Steps showYourWork, Expression l, Expression r, int unknownQuantityIndex) {
 
       //write down current step of equation
       showYourWork.addStep(l.toString() + " = " + r.toString());
@@ -37,11 +32,7 @@ public class Algebra {
       Expression rightSide = null;
       Expression leftSide = null;
 
-      if (l.getIsKnown() && r.getIsKnown()) {
-         //if there are no variables (program should probably never reach this point)
-         Algebra.verifyEquality(l.evaluate(), r.evaluate());
-      }
-      else if (l.getIsKnown()) {
+      if (l.getIsKnown()) {
          // leftSide is known, rightSide is NOT known
          leftSide = r;
          rightSide = l;
@@ -109,7 +100,7 @@ public class Algebra {
          }
 
          showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
-
+         showYourWork.setAnswer(rightSide.evaluate());
       }
 
       //If we are solving for time, the answer cannot be negative
@@ -117,8 +108,7 @@ public class Algebra {
       if (rightSide.evaluate() < 0 && isTime) {
          throw new IllegalArgumentException("ERROR: Time cannot be negative");
       }
-
-
+      showYourWork.replaceLastValue(leftSide + " = " + rightSide.evaluate() + " " + standardUnits[unknownQuantityIndex]);
    }
 
 

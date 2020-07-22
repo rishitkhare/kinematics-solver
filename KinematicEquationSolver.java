@@ -99,48 +99,50 @@ public class KinematicEquationSolver {
    public static void processInput(String input) {
 
       //try catch loop will catch impossible problems and invalid user input. Any other errors should not occur.
-      try {
+      //try {
          //creates object as null, arrays store info that will be passed to constructor of one of the KinematicEquation subclasses
          KinematicEquation solution = null;
          boolean[] knowns = new boolean[5];
-         String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"}; //NEEDS CLEANUP
+         String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"}; //NEEDS CLEANUP (WHY)
 
          //parses user input to decide which equation to use and then asks for required quantities
          if (input.equalsIgnoreCase("solve")) {
             //equation is not given
-
             solution = new KinematicEquation();
             solveFromUnknowns(solution, knowns, quantities); //this method handles getting necessary quantities, solving, and printing
             return;
          }
-         else if (input.equalsIgnoreCase("1") || input.equalsIgnoreCase("Earth")) {
-            System.out.println(displayKinematicEquation(0));
-            setQuantities(quantities, knowns, 0);
-            solution = new Earth(knowns, quantities);
-         }
-         else if (input.equalsIgnoreCase("2") || input.equalsIgnoreCase("Water")) {
-            System.out.println(displayKinematicEquation(1));
-            setQuantities(quantities, knowns, 1);
-            solution = new Water(knowns, quantities);
-         }
-         else if (input.equalsIgnoreCase("3") || input.equalsIgnoreCase("Fire")) {
-            System.out.println(displayKinematicEquation(2));
-            setQuantities(quantities, knowns, 2);
-            solution = new Fire(knowns, quantities);
-         }
-         else if (input.equalsIgnoreCase("4") || input.equalsIgnoreCase("Air")) {
-            System.out.println(displayKinematicEquation(3));
-            setQuantities(quantities, knowns, 3);
-            solution = new Air(knowns, quantities);
-         }
-         else if (input.equalsIgnoreCase("5") || input.equalsIgnoreCase("Shadow")) {
-            System.out.println(displayKinematicEquation(4));
-            setQuantities(quantities, knowns, 4);
-            solution = new Shadow(knowns, quantities);
-         }
          else {
-            throw new IllegalArgumentException("\tERROR: " + "Invalid input: \"" + input + "\"");
+            if (input.equalsIgnoreCase("1") || input.equalsIgnoreCase("Earth")) {
+               System.out.println(displayKinematicEquation(0));
+               setQuantities(quantities, knowns, 0);
+               solution = new Earth(knowns, quantities);
+            }
+            else if (input.equalsIgnoreCase("2") || input.equalsIgnoreCase("Water")) {
+               System.out.println(displayKinematicEquation(1));
+               setQuantities(quantities, knowns, 1);
+               solution = new Water(knowns, quantities);
+            }
+            else if (input.equalsIgnoreCase("3") || input.equalsIgnoreCase("Fire")) {
+               System.out.println(displayKinematicEquation(2));
+               setQuantities(quantities, knowns, 2);
+               solution = new Fire(knowns, quantities);
+            }
+            else if (input.equalsIgnoreCase("4") || input.equalsIgnoreCase("Air")) {
+               System.out.println(displayKinematicEquation(3));
+               setQuantities(quantities, knowns, 3);
+               solution = new Air(knowns, quantities);
+            }
+            else if (input.equalsIgnoreCase("5") || input.equalsIgnoreCase("Shadow")) {
+               System.out.println(displayKinematicEquation(4));
+               setQuantities(quantities, knowns, 4);
+               solution = new Shadow(knowns, quantities);
+            }
+            else {
+               throw new IllegalArgumentException("\tERROR: " + "Invalid input: \"" + input + "\"");
+            }
          }
+
 
          //solves the problem
          solution.doAlgebra();
@@ -152,10 +154,10 @@ public class KinematicEquationSolver {
          System.out.print("Enter \"w\" to display the work for this problem. Press \"enter\" to continue: ");
          String answer = SCAN.nextLine();
          if (answer.equalsIgnoreCase("w")) {
-            System.out.println(solution.getWork());
+            System.out.println(solution.getWorkString());
          }
 
-      }
+     /* }
       catch (IllegalArgumentException ex) {
          if (ex.toString().contains("ERROR")) {
             System.out.println("\t" + ex.toString().substring(ex.toString().indexOf("ERROR")));
@@ -168,39 +170,53 @@ public class KinematicEquationSolver {
             System.out.println("\t" + ex.toString());
          }
          printEmptyLine();
-      }
+      }*/
    }
 
    public static void solveFromUnknowns(KinematicEquation generalEquation, boolean[] knowns, String[] quantities) {
-      Steps work;
 
-      //ask for all quantities TODO: shouldn't we be using setQuantities() here? Perhaps create a new method in KinematicEquation.java?
+      //ask for all quantities
       setQuantities(quantities, knowns, 5);
       generalEquation.setQuantities(quantities);
       generalEquation.setKnownQuantities(knowns);
+
+      ArrayList<Steps> allWork = new ArrayList<Steps>();
 
       //depending on how many knowns we have, different approach will be taken
       if (generalEquation.numberOfKnownQuantities() < 3) {
          //Not enough info (5 variables, we must know at least 3)
          throw new IllegalArgumentException("ERROR: Not enough information");
       }
-      else if (generalEquation.numberOfKnownQuantities() == 3) {
-         //TODO: add functionality for 3 given quantities
-      }
-      else if ((generalEquation.numberOfKnownQuantities() == 4)) {
-         //figuring out which one is not known
-         int unknownIndex = generalEquation.getMissingQuantityIndex();
+      else if (generalEquation.numberOfKnownQuantities() == 3 || generalEquation.numberOfKnownQuantities() == 4)  {
+         while(generalEquation.numberOfKnownQuantities() != 5) {
+            if (know3SharedValues(knowns, Earth.presentQuantities)) {
+               generalEquation = new Earth(knowns, quantities);
+            }
+            else if (know3SharedValues(knowns, Water.presentQuantities)) {
+               generalEquation = new Water(knowns, quantities);
+            }
+            else if (know3SharedValues(knowns, Fire.presentQuantities)) {
+               generalEquation = new Fire(knowns, quantities);
+            }
+            else if (know3SharedValues(knowns, Air.presentQuantities)) {
+               generalEquation = new Air(knowns, quantities);
+            }
+            else if (know3SharedValues(knowns, Shadow.presentQuantities)) {
+               generalEquation = new Shadow(knowns, quantities);
+            }
+            else {
+               throw new IllegalArgumentException("ERROR: HOW DID WE GET HERE.");
+            }
 
-         //if the unknown is ΔX, then use water, otherwise earth is
-         if (unknownIndex != 4) {
-            generalEquation = (Earth) new Earth(generalEquation.getKnownQuantities(), generalEquation.getQuantities());
-         }
-         else {
-            generalEquation = new Water(generalEquation.getKnownQuantities(), generalEquation.getQuantities());
-         }
+            //solves the problem
+            generalEquation.doAlgebra();
+            //print the answer
+            System.out.println(generalEquation.getAnswer());
 
-         generalEquation.doAlgebra();
-         System.out.println(generalEquation.getAnswer());
+            allWork.add(generalEquation.getWork());
+
+            generalEquation = new KinematicEquation(generalEquation.getKnownQuantities(), generalEquation.getQuantities());
+         }
       }
       else { // knows all 5 values
          //verifies two equations to verify all five values
@@ -208,27 +224,9 @@ public class KinematicEquationSolver {
          //the following code checks to make sure
 
          boolean isValid = false;
-
-         //TODO: this try-catch loop burns my soul, we need to make Algebra.verifyEquality() return a boolean and then change this.
-         try {
-            //verifies earth
-            Algebra.verifyEquality(generalEquation.getNumericalQuantity(1), generalEquation.getNumericalQuantity(0) + (generalEquation.getNumericalQuantity(3) * generalEquation.getNumericalQuantity(2)));
-         } catch(IllegalArgumentException earthResult){
-            //updates isValid accordingly
-            if(earthResult.toString().equals("ERROR: Umm you already know all the quantities")) {
-               //verifies water
-               try {
-                  Algebra.verifyEquality(generalEquation.getNumericalQuantity(4), 0.5 * (generalEquation.getNumericalQuantity(0) + generalEquation.getNumericalQuantity(1)) * generalEquation.getNumericalQuantity(2));
-               } catch(IllegalArgumentException waterResult) {
-                  if(waterResult.toString().equals("ERROR: Umm you already know all the quantities")) {
-                     isValid = true;
-                  }
-               }
-            }
-         }
-
-         //TODO: if Algebra.verifyEquality() is made to return boolean, we can get rid of the try-catch and use an && operator here.
-         if(isValid) {
+         Earth verifyEarth = new Earth(knowns, quantities);
+         Water verifyWater = new Water(knowns, quantities);
+         if (Algebra.isEqualEquation(verifyEarth.getLeftSide(), verifyEarth.getRightSide()) && Algebra.isEqualEquation(verifyWater.getLeftSide(), verifyWater.getRightSide())) {
             throw new IllegalArgumentException("ERROR: Umm you already know all the quantities");
          }
          else {
@@ -236,6 +234,14 @@ public class KinematicEquationSolver {
          }
       }
 
+      System.out.print("Enter \"w\" to display the work for this problem. Press \"enter\" to continue: ");
+      String answer = SCAN.nextLine();
+      if (answer.equalsIgnoreCase("w")) {
+         for(Steps eachWork : allWork) {
+            System.out.println(eachWork.toString());
+            printEmptyLine();
+         }
+      }
    }
 
    public static String askForQuantity(String[] quantities, String quantity, boolean[] knowns, int quantityIndex) {
@@ -256,12 +262,10 @@ public class KinematicEquationSolver {
          throw new IllegalArgumentException("quit");
       } else if (Algebra.isNumber(terms[0])) {
          knowns[quantityIndex] = true;
-
          if (terms.length == 1) {
             return terms[0].toString();
          }
          else {
-
             if (quantityIndex == 0) {
                quantityIndex = 1;
             }
@@ -279,4 +283,17 @@ public class KinematicEquationSolver {
          quantities[quantityIndex] = askForQuantity(quantities, QUANTITY_NAMES[quantityIndex], knowns, quantityIndex);
       }
    }
+
+   public static boolean know3SharedValues(boolean[] knowns1, boolean[] knowns2) {
+      // Assuming that knowns1.length = knowns2.length = 5
+      int count = 0;
+      for (int index = 0; index < knowns1.length; index++) {
+         if (knowns1[index] && knowns2[index]) {
+            count++;
+         }
+      }
+
+      return count == 3;
+   }
+
 }

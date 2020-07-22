@@ -1,8 +1,10 @@
 public class Air extends KinematicEquation {
 
    public static final String equation = "ΔX = ViΔt + 1/2aΔt^2";
+   public static final boolean[] presentQuantities = {true, false, true, true, true};
 
    public Air(boolean[] knownQuantities, String[] quantities) {
+      super.absentQuantityIndex = 1;
       setKnownQuantities(knownQuantities);
       super.setQuantities(quantities);
 
@@ -20,7 +22,9 @@ public class Air extends KinematicEquation {
          Algebra.getPositiveQuadraticRoot(work, 0.5 * getNumericalQuantity(3), getNumericalQuantity(0), -1 * getNumericalQuantity(4));
       }
       else {
-         Algebra.solveEquation(false, work, leftSide, rightSide);
+         Algebra.solveEquation(false, work, leftSide, rightSide, getMissingQuantityIndex());
       }
+
+      setQuantity(getMissingQuantityIndex(), this.work.getNumericalAnswer()); //adds answer to array and updates knowns
    }
 }
