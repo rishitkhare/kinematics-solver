@@ -5,13 +5,15 @@ public class Air extends KinematicEquation {
    public Air(boolean[] knownQuantities, String[] quantities) {
       setKnownQuantities(knownQuantities);
       super.setQuantities(quantities);
+
+      setLeftSide(new UnaryExpression(getQuantity(4)));
+      setRightSide(new BinaryExpression(new BinaryExpression(new UnaryExpression(getQuantity(0)), new UnaryExpression(getQuantity(2)), '*'), new BinaryExpression(new BinaryExpression("0.5", new UnaryExpression(getQuantity(3)), '*'), new BinaryExpression(new UnaryExpression(getQuantity(2)), "2", '^'), '*'), '+'));
+
       checkNumberOfQuantities(numberOfKnownQuantities());
    }
 
    @Override
    public void doAlgebra() {
-      Expression leftSide = new UnaryExpression(getQuantity(4));
-      Expression rightSide = new BinaryExpression(new BinaryExpression(new UnaryExpression(getQuantity(0)), new UnaryExpression(getQuantity(2)), '*'), new BinaryExpression(new BinaryExpression("0.5", new UnaryExpression(getQuantity(3)), '*'), new BinaryExpression(new UnaryExpression(getQuantity(2)), "2", '^'), '*'), '+');
 
       setWork(new Steps(equation));
       if (!isTimeKnown()) {

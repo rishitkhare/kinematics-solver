@@ -1,3 +1,6 @@
+//abstract class acting as super for BinaryExpression and UnaryExpression
+//helps implement the binary tree algorithm for the algebra
+
 public abstract class Expression {
     private boolean isKnown;
 

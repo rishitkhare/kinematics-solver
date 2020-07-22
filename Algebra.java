@@ -5,6 +5,8 @@ public class Algebra {
    //prevents instantiation
    private Algebra() {}
 
+
+   //TODO: make this method return a boolean and change uses of this method across the program.
    public static void verifyEquality(double value1, double value2) {
       if (value1 != value2) {
          throw new IllegalArgumentException("ERROR: Unequal equation");
@@ -13,13 +15,8 @@ public class Algebra {
          throw new IllegalArgumentException("ERROR: Umm you already know all the quantities");
       }
    }
-   
-   public static boolean isOperand(String component) {
-      return (component.equals("+") || component.equals("-") || component.equals("(") || 
-             component.equals("*") || component.equals("/") || component.equals(")") ||
-             component.equals("^"));      
-   }
-   
+
+   // checks if a String can be parsed as Double
    public static boolean isNumber(String component) {
       try {
          double num = Double.parseDouble(component);
@@ -30,13 +27,18 @@ public class Algebra {
       }
    }
 
+   // given a left and right side of an equation, a Steps object, and if the unknown is time (for special cases)
    public static void solveEquation(boolean isTime, Steps showYourWork, Expression l, Expression r) {
 
+      //write down current step of equation
       showYourWork.addStep(l.toString() + " = " + r.toString());
 
+      //if the unknown is on the right side, then flip them
       Expression rightSide = null;
       Expression leftSide = null;
+
       if (l.getIsKnown() && r.getIsKnown()) {
+         //if there are no variables (program should probably never reach this point)
          Algebra.verifyEquality(l.evaluate(), r.evaluate());
       }
       else if (l.getIsKnown()) {
@@ -45,76 +47,82 @@ public class Algebra {
          rightSide = l;
       }
       else if (r.getIsKnown()) {
+         // leftSide is unknown, right is (leave the equation as is)
          leftSide = l;
          rightSide = r;
       }
       else {
+         //if there are variables on both sides, then something went wrong
          throw new IllegalArgumentException("ERROR: Both sides of equation contain an unknown value");
       }
+
+      //add step to work
       showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
 
+      //essentially does algebra until the variable is isolated on one side
       while (leftSide instanceof BinaryExpression) {
+
          BinaryExpression binaryLeftSide = (BinaryExpression) leftSide;
          char operator = binaryLeftSide.getOperator();
          boolean isOperand1Known;
          Expression knownExpression;
+
+         // change the left side by taking the unknown branch and isolating it
          if (binaryLeftSide.getOperand1().getIsKnown()) {
             knownExpression = binaryLeftSide.getOperand1();
             isOperand1Known = true;
 
             leftSide = ((BinaryExpression) leftSide).getOperand2();
-         }
-         else if (binaryLeftSide.getOperand2().getIsKnown()) {
+         } else if (binaryLeftSide.getOperand2().getIsKnown()) {
             knownExpression = binaryLeftSide.getOperand2();
             isOperand1Known = false;
 
             leftSide = ((BinaryExpression) leftSide).getOperand1();
 
-         }
-         else {
+         } else {
             throw new IllegalArgumentException("ERROR: Neither expression in the leftside contains a known value");
          }
 
-         // Change right side
+         // Change right side in accordance with what was removed from the left side
          if (operator == '+') {
             rightSide = new BinaryExpression(rightSide, knownExpression, '-');
-         }
-         else if (operator == '-') {
+         } else if (operator == '-') {
             if (isOperand1Known) {
                rightSide = new BinaryExpression(knownExpression, rightSide, '-');
+            } else {
+               rightSide = new BinaryExpression(rightSide, knownExpression, '+');
             }
-            else {
-              rightSide = new BinaryExpression(rightSide, knownExpression, '+');
-            }
-         }
-         else if (operator == '*') {
+         } else if (operator == '*') {
             rightSide = new BinaryExpression(rightSide, knownExpression, '/');
-         }
-         else if (operator == '/') {
+         } else if (operator == '/') {
             if (isOperand1Known) {
                rightSide = new BinaryExpression(knownExpression, rightSide, '/');
-            }
-            else {
+            } else {
                rightSide = new BinaryExpression(rightSide, knownExpression, '*');
             }
-         }
-         else if (operator == '^' && !isOperand1Known) {
+         } else if (operator == '^' && !isOperand1Known) {
             double exponent = Math.pow(knownExpression.evaluate(), -1);
             UnaryExpression exponentExpression = new UnaryExpression(Double.toString(exponent));
             rightSide = new BinaryExpression(rightSide, exponentExpression, '^');
-         }
-         else {
+         } else {
             throw new IllegalArgumentException("ERROR: Invalid operator " + operator);
          }
-         if (rightSide.evaluate() <= 0 && isTime) {
-            throw new IllegalArgumentException("ERROR: Time cannot be negative");
-         }
-         else {
-            showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
-         }
+
+         showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
+
       }
+
+      //If we are solving for time, the answer cannot be negative
+
+      if (rightSide.evaluate() < 0 && isTime) {
+         throw new IllegalArgumentException("ERROR: Time cannot be negative");
+      }
+
+
    }
 
+
+   //Quadratic equation for special case (AIR) (Also cannot return negative because isTime is guaranteed)
    public static void getPositiveQuadraticRoot(Steps showYourWork, double a, double b, double c) {
       showYourWork.addStep("Δt = (-b ± √(b^2 - 4ac) / 2a");
       showYourWork.addStep("Δt = (" + (-1 * b) + " ± √(" + Math.pow(b, 2) + " - " + (4 * a * c) + ") / " + (2 * a));

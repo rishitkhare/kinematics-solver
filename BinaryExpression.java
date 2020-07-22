@@ -1,8 +1,12 @@
+//node of algebra binary tree that has a node (operator), and two branches (operands)
+
 public class BinaryExpression extends Expression {
 
     private Expression operand1;
     private Expression operand2;
     private char operator;
+
+    //constructor can also take String that gets converted to UnaryExpression instead of Expression
 
     public BinaryExpression(Expression operand1, Expression operand2, char operator) {
         setIsKnown(operand1.getIsKnown() && operand2.getIsKnown());
@@ -22,6 +26,8 @@ public class BinaryExpression extends Expression {
 
     }
 
+
+    //toString method for committing the equation to Steps object
     public String toString() {
         if (operand1.getIsKnown() && operand2.getIsKnown()) {
             return Double.toString(evaluate());
@@ -37,6 +43,8 @@ public class BinaryExpression extends Expression {
         }
     }
 
+    //*** ACCESSORS ***\\
+
     public Expression getOperand1() {
         return operand1;
     }
@@ -49,6 +57,8 @@ public class BinaryExpression extends Expression {
         return operator;
     }
 
+
+    // Evaluates by calling the .evaluate() of its branches and combining them with the operator
     public double evaluate() {
         // Only runs when isKnown
         if (operator == '^') {

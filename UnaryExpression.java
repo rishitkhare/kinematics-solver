@@ -1,3 +1,5 @@
+//represents leaf of binary tree
+
 public class UnaryExpression extends Expression {
 
     private String value;

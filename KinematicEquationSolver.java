@@ -2,28 +2,36 @@ import java.util.*;
 
 public class KinematicEquationSolver {
 
+   //class constant input file
    public static final Scanner SCAN = new Scanner(System.in);
-   
+
+   //Used to printKinematicEquations();
    public static final String[][] EQUATIONS = { {"Earth", "Vf = Vi + aΔt"},
-                                                {"Water", "ΔX = 1/2(Vf + Vi)Δt"}, 
-                                                {"Fire", "Vf^2 = Vi^2 + 2aΔX"}, 
+                                                {"Water", "ΔX = 1/2(Vf + Vi)Δt"},
+                                                {"Fire", "Vf^2 = Vi^2 + 2aΔX"},
                                                 {"Air", "ΔX = ViΔt + 1/2aΔt^2"},
                                                 {"Shadow", "ΔX = VfΔt - 1/2aΔt^2"} };
 
+   //Each variable in the kinematics equations is stored in an array, and the indexes are as follows:
    public static final String[] QUANTITY_NAMES = {"initial velocity", "final velocity", "time", "acceleration", "displacement"};
 
+   //Uses the indexes of QUANTITY_NAMES to write the order in which each of the values are asked of the user
    public static final int[][] EQUATION_ASK_ORDER = { {1, 0, 3, 2}, // Earth
                                                       {4, 1, 0, 2}, // Water
                                                       {1, 0, 3, 4}, // Fire
                                                       {4, 0, 2, 3}, // Air
-                                                      {4, 1, 2, 3} }; // Shadow
+                                                      {4, 1, 2, 3},  // Shadow
+                                                      {0, 1, 2, 3, 4} }; // Solving from given unknowns
 
+   //main method
    public static void main(String[] args) {
-      System.out.println(UnitConversion.getValidUnits());
+      //prints out information for the user
       printWelcomeMessage();
       printEmptyLine();
       printKinematicEquations();
       printEmptyLine();
+
+      //input loop that continues to ask for kinematics problems until user types "quit"
       String input = getEquationInput(true);
       while (! input.equalsIgnoreCase("quit")) {
          if (! input.equalsIgnoreCase("quit")) {
@@ -31,39 +39,48 @@ public class KinematicEquationSolver {
          }
          input = getEquationInput(false);
       }
+
+
       printGoodbyeMessage();
    }
-   
+
    public static void printEmptyLine() {
       System.out.println();
    }
-   
+
+   //Welcome message for the program
    public static void printWelcomeMessage() {
       System.out.println("Hello and welcome to the kinematic equation solver");
    }
-   
+
+   //Final message upon quitting program
    public static void printGoodbyeMessage() {
       System.out.println("Ok. I get it. You don't want me. Come again for my daily uploads.");
    }
-   
+
+   //prints all the kinematic equations for the user
    public static void printKinematicEquations() {
       System.out.println("There are " + EQUATIONS.length + " kinematic equations:");
       for (int rowIndex = 0; rowIndex < EQUATIONS.length; rowIndex++) {
          System.out.println(displayKinematicEquation(rowIndex));
       }   
    }
-   
+
+   //used in printKinematicEquations() to print ONE equation
    public static String displayKinematicEquation(int rowIndex) {
       return "\t" + (rowIndex + 1) + ". " + EQUATIONS[rowIndex][0] + ": " + EQUATIONS[rowIndex][1];
    }
-   
+
+   //text prompt for user to pick an equation (should only happen the first time)
    public static String getEquationCommand() {
       return "Enter an equation's name or number(1-" + EQUATIONS.length + ")" + "\n" + 
              "If you prefer to enter values and solve automatically, enter \"solve\"" + "\n" +
              "Enter \"quit\" to exit the program";
                  
    }
-   
+
+   //boolean parameter tells it whether or not to print the long version or the short version
+   //the long version is only printed the first time upon running program, as seen in main()
    public static String getEquationInput(boolean printEquationCommand) {
       if (printEquationCommand) {
          System.out.println(getEquationCommand()); 
@@ -77,15 +94,23 @@ public class KinematicEquationSolver {
 
       return SCAN.nextLine();
    }
-   
+
+   //takes user input and begins constructing the KinematicEquation object to solve the problem
    public static void processInput(String input) {
+
+      //try catch loop will catch impossible problems and invalid user input. Any other errors should not occur.
       try {
+         //creates object as null, arrays store info that will be passed to constructor of one of the KinematicEquation subclasses
          KinematicEquation solution = null;
          boolean[] knowns = new boolean[5];
-         String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"};
+         String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"}; //NEEDS CLEANUP
+
+         //parses user input to decide which equation to use and then asks for required quantities
          if (input.equalsIgnoreCase("solve")) {
+            //equation is not given
+
             solution = new KinematicEquation();
-            solveEquation(solution, knowns, quantities);
+            solveFromUnknowns(solution, knowns, quantities); //this method handles getting necessary quantities, solving, and printing
             return;
          }
          else if (input.equalsIgnoreCase("1") || input.equalsIgnoreCase("Earth")) {
@@ -117,13 +142,19 @@ public class KinematicEquationSolver {
             throw new IllegalArgumentException("\tERROR: " + "Invalid input: \"" + input + "\"");
          }
 
+         //solves the problem
          solution.doAlgebra();
+
+         //print the answer
          System.out.println(solution.getAnswer());
+
+         //displaying steps stored in the object if user asks for them
          System.out.print("Enter \"w\" to display the work for this problem. Press \"enter\" to continue: ");
          String answer = SCAN.nextLine();
          if (answer.equalsIgnoreCase("w")) {
             System.out.println(solution.getWork());
          }
+
       }
       catch (IllegalArgumentException ex) {
          if (ex.toString().contains("ERROR")) {
@@ -140,21 +171,27 @@ public class KinematicEquationSolver {
       }
    }
 
-   public static void solveEquation(KinematicEquation generalEquation, boolean[] knowns, String[] quantities) {
+   public static void solveFromUnknowns(KinematicEquation generalEquation, boolean[] knowns, String[] quantities) {
       Steps work;
-      generalEquation.setQuantity(0, askForQuantity(quantities, "initial velocity", knowns,0));
-      generalEquation.setQuantity(1, askForQuantity(quantities, "final velocity", knowns, 1));
-      generalEquation.setQuantity(2, askForQuantity(quantities, "time", knowns,2));
-      generalEquation.setQuantity(3, askForQuantity(quantities, "acceleration", knowns,3));
-      generalEquation.setQuantity(4, askForQuantity(quantities, "displacement", knowns,4));
+
+      //ask for all quantities TODO: shouldn't we be using setQuantities() here? Perhaps create a new method in KinematicEquation.java?
+      setQuantities(quantities, knowns, 5);
+      generalEquation.setQuantities(quantities);
+      generalEquation.setKnownQuantities(knowns);
+
+      //depending on how many knowns we have, different approach will be taken
       if (generalEquation.numberOfKnownQuantities() < 3) {
-         throw new IllegalArgumentException("ERROR: Must have at least 3 quantities");
+         //Not enough info (5 variables, we must know at least 3)
+         throw new IllegalArgumentException("ERROR: Not enough information");
       }
       else if (generalEquation.numberOfKnownQuantities() == 3) {
-
+         //TODO: add functionality for 3 given quantities
       }
       else if ((generalEquation.numberOfKnownQuantities() == 4)) {
+         //figuring out which one is not known
          int unknownIndex = generalEquation.getMissingQuantityIndex();
+
+         //if the unknown is ΔX, then use water, otherwise earth is
          if (unknownIndex != 4) {
             generalEquation = (Earth) new Earth(generalEquation.getKnownQuantities(), generalEquation.getQuantities());
          }
@@ -167,12 +204,14 @@ public class KinematicEquationSolver {
       }
       else { // knows all 5 values
          //verifies two equations to verify all five values
+         //this else statement will always throw an error, because the equation will either already be solved or be incorrect
+         //the following code checks to make sure
 
          boolean isValid = false;
 
+         //TODO: this try-catch loop burns my soul, we need to make Algebra.verifyEquality() return a boolean and then change this.
          try {
             //verifies earth
-            //(this will always throw an error)
             Algebra.verifyEquality(generalEquation.getNumericalQuantity(1), generalEquation.getNumericalQuantity(0) + (generalEquation.getNumericalQuantity(3) * generalEquation.getNumericalQuantity(2)));
          } catch(IllegalArgumentException earthResult){
             //updates isValid accordingly
@@ -188,6 +227,7 @@ public class KinematicEquationSolver {
             }
          }
 
+         //TODO: if Algebra.verifyEquality() is made to return boolean, we can get rid of the try-catch and use an && operator here.
          if(isValid) {
             throw new IllegalArgumentException("ERROR: Umm you already know all the quantities");
          }

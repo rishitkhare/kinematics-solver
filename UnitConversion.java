@@ -1,3 +1,7 @@
+// This is a static class used to convert to the base units: meters & seconds
+// It works by having an array of units and a parallel array of conversion factors, and uses dimensional analysis
+// to convert between compound units, like m/s
+
 import java.util.*;
 
 public class UnitConversion {
@@ -10,6 +14,7 @@ public class UnitConversion {
 
     private static final String[][] allValidUnitsAGAIN = { {"in", "ft", "yd", "ftbl", "fm", "cbl", "furlong", "mi", "nmi", "nm", "mm", "cm", "m", "km", "au", "lyr"},
                                                            {"ps", "ms", "jiffy", "s", "sec", "min", "h", "hr", "hrs", "day", "wk", "ftn", "mo", "yr"} };
+
 
     private static final String[] validTimeUnits = {"ps", "ms", "jiffy", "s", "sec", "min", "h", "hr", "hrs", "day", "wk", "ftn", "mo", "yr"};
     private static final double[] convertToSeconds = {1E-12, 0.001, 0.01, 1, 1, 60, 3600, 3600, 3600, 86400, 604800, 1209600, 2.628E6, 3.154E7};
@@ -28,7 +33,7 @@ public class UnitConversion {
             throw new IllegalArgumentException("ERROR: Invalid unit: " + unit);
         }
 
-        //if singular unit, skip the dimensional analysis //TODO : Squared units will break this system (not necessary for kinematics)
+        //if singular unit, skip the dimensional analysis
         if(! unit.contains("/")) {
             return singularUnitToConversionFactor(unit);
         }
@@ -71,8 +76,9 @@ public class UnitConversion {
         return fullText.substring(fullText.indexOf(" ") + 1);
     }
 
-    //why do these methods not exist in the Arrays class???? (.contains(), .indexOf())
+    //some basic array methods that are for utility:
 
+    //takes an array and checks if it contains an item (only works for String[])
     private static boolean stringArrayContains(String s, String[] array) {
         for(String item : array) {
             if(item.equals(s)) {
@@ -82,6 +88,7 @@ public class UnitConversion {
         return false;
     }
 
+    //finds the first index of a string in an array
     private static int stringArrayIndexOf(String s, String[] array) {
         for(int i = 0; i < array.length; i ++) {
             if(s.equals(array[i])) {
@@ -91,6 +98,7 @@ public class UnitConversion {
         return -1;
     }
 
+    // returns whether or not the given unit is valid acceleration, velocity, time, or displacement unit
     // Velocity = 1, Time = 2, Acceleration = 3, Displacement = 4
     public static int getQuantityIndex(String unit) {
         if (unit.contains("/")) {
@@ -121,6 +129,7 @@ public class UnitConversion {
         }
     }
 
+    //returns a table of possible units for the user
     public static String getValidUnits() {
         String[][] validDisplacementUnits = { {"inches", "in"},
                                               {"feet", "ft"},
