@@ -1,9 +1,10 @@
 import java.util.*;
+import java.io.*;
 
 public class KinematicEquationSolver {
 
    //class constant input file
-   public static final Scanner SCAN = new Scanner(System.in);
+   public static Scanner scan = new Scanner(System.in);
 
    //Used to printKinematicEquations();
    public static final String[][] EQUATIONS = { {"Earth", "Vf = Vi + aΔt"},
@@ -27,22 +28,29 @@ public class KinematicEquationSolver {
    public static void main(String[] args) {
       //prints out information for the user
       runTests();
-//      printWelcomeMessage();
-//      printEmptyLine();
-//      printKinematicEquations();
-//      printEmptyLine();
-//
-//      //input loop that continues to ask for kinematics problems until user types "quit"
-//      String input = getEquationInput(true);
-//      while (! input.equalsIgnoreCase("quit")) {
-//         if (! input.equalsIgnoreCase("quit")) {
-//            processInput(input);
-//         }
-//         input = getEquationInput(false);
-//      }
-//
-//
-//      printGoodbyeMessage();
+      scan = new Scanner(System.in);
+      printWelcomeMessage();
+      printEmptyLine();
+      printKinematicEquations();
+      printEmptyLine();
+
+      //input loop that continues to ask for kinematics problems until user types "quit"
+      String input = getEquationInput(true);
+      while (! input.equalsIgnoreCase("quit")) {
+         if (! input.equalsIgnoreCase("quit")) {
+            Steps solution = processInput(input);
+            System.out.println(solution.getLastStep());
+            System.out.print("Enter \"w\" to display the work for this problem. Press \"enter\" to continue: ");
+            String answer = scan.nextLine();
+            if (answer.equalsIgnoreCase("w")) {
+               System.out.println(solution.toString());
+            }
+         }
+         input = getEquationInput(false);
+      }
+
+
+      printGoodbyeMessage();
    }
 
    public static void printEmptyLine() {
@@ -93,25 +101,23 @@ public class KinematicEquationSolver {
       System.out.print("What can I help you with? ");
       String answer = "";
 
-      return SCAN.nextLine();
+      return scan.nextLine();
    }
 
    //takes user input and begins constructing the KinematicEquation object to solve the problem
-   public static void processInput(String input) {
-
+   public static Steps processInput(String input) {
       //try catch loop will catch impossible problems and invalid user input. Any other errors should not occur.
       //try {
          //creates object as null, arrays store info that will be passed to constructor of one of the KinematicEquation subclasses
          KinematicEquation solution = null;
          boolean[] knowns = new boolean[5];
-         String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"}; //NEEDS CLEANUP (WHY)
+         String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"}; //Make this part of KinematicEquation constructor
 
          //parses user input to decide which equation to use and then asks for required quantities
          if (input.equalsIgnoreCase("solve")) {
             //equation is not given
             solution = new KinematicEquation();
             solveFromUnknowns(solution, knowns, quantities); //this method handles getting necessary quantities, solving, and printing
-            return;
          }
          else {
             if (input.equalsIgnoreCase("1") || input.equalsIgnoreCase("Earth")) {
@@ -149,14 +155,7 @@ public class KinematicEquationSolver {
          solution.doAlgebra();
 
          //print the answer
-         System.out.println(solution.getAnswer());
-
-         //displaying steps stored in the object if user asks for them
-         System.out.print("Enter \"w\" to display the work for this problem. Press \"enter\" to continue: ");
-         String answer = SCAN.nextLine();
-         if (answer.equalsIgnoreCase("w")) {
-            System.out.println(solution.getWorkString());
-         }
+         return solution.getWork();
 
      /* }
       catch (IllegalArgumentException ex) {
@@ -236,7 +235,7 @@ public class KinematicEquationSolver {
       }
 
       System.out.print("Enter \"w\" to display the work for this problem. Press \"enter\" to continue: ");
-      String answer = SCAN.nextLine();
+      String answer = scan.nextLine();
       if (answer.equalsIgnoreCase("w")) {
          for(Steps eachWork : allWork) {
             System.out.println(eachWork.toString());
@@ -246,8 +245,9 @@ public class KinematicEquationSolver {
    }
 
    public static String askForQuantity(String[] quantities, String quantity, boolean[] knowns, int quantityIndex) {
-      System.out.print("What is the value for the " + quantity + ". Enter \"?\" if unknown. Enter \"u\" to display possible units and proper abbreviations: ");
-      String input = SCAN.nextLine();
+
+      System.out.println("What is the value for the " + quantity + ". Enter \"?\" if unknown. Enter \"u\" to display possible units and proper abbreviations: ");
+      String input = scan.nextLine();
       if(input.equalsIgnoreCase("u")) {
          System.out.println(UnitConversion.getValidUnits());
          input = askForQuantity(quantities, quantity, knowns, quantityIndex);
@@ -315,40 +315,26 @@ public class KinematicEquationSolver {
       return count == 3;
    }
 
-//   public static void runTests() {
-//      int count = 0;
-//      // Vf = Vi + aΔt
-//      String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"};
-//      boolean[] knowns = new boolean[5];
-//
-//      String[][] earthTests =  { {"12", "6", "2", "?", "3.0"},
-//                                               {"3 km/hr", "?", "4 m/s^2", "12 min", "-2879.167"},
-//                                               {"?", "11 m/s", "40 km/hr^2", "1s", "11.003"},
-//                                               {"214", "114 m/s", "?", "2.5 s", "40"},
-//                                               {"12 km/min", "171 yd/s", "?", "270 ms", "161.622"} };
-//      for (int row = 0; row < earthTests.length; row++) {
-//         for (int col = 0; col < earthTests[row].length - 1; col++) {
-//            setQuantity(quantities, knowns, EQUATION_ASK_ORDER[0][col], earthTests[row][col]);
-//         }
-//         Earth earthTest = new Earth(knowns, quantities);
-//         earthTest.doAlgebra();
-//         if (Algebra.isEqualTestEquation(Double.parseDouble(earthTest.getWork().getNumericalAnswer()), Double.parseDouble(earthTests[row][4]))) {
-//            count++;
-//         }
-//         else {
-//            System.out.println("ERROR: Failed test case");
-//            System.out.println("Computer generated answer: " + earthTest.getWork().getNumericalAnswer());
-//            System.out.println("Human generated answer: " + earthTests[row][4]);
-//         }
-//      }
-//      System.out.println("You passed " + count + " out of 5 cases. You suck!");
-//      // ΔX = 1/2(Vf + Vi)Δt
-//      String[][] waterTests =  { {"24 m", "?", "19 m/s", "0.5", "77"},
-//                                 {"?", "109 cm/s", "21 km/min", "283 jiffy", "496.792"},
-//                                 {"41 km", "22 cbl/s", "0.23 mi/min", "?", "20.082"},
-//                                 {"?", "9 m/s", "0", "0 s", "0"},
-//                                 {"12 mi", "11 in/ms", "?", "12 s", "2939.288"} };
-//
-//   }
+   public static void runTests() {
+
+      int count = 0;
+
+      File testFile = new File("TestCases.txt");
+      try {
+         scan = new Scanner(new File("TestCases.txt"));
+      }
+      catch (FileNotFoundException ex) { }
+      int testIndex = 0;
+      while (scan.hasNextLine()) {
+         if (processInput(scan.nextLine()).getNumericalAnswer() == testsAnswers[testIndex])
+         scan.nextLine();
+      }
+
+      double [] testsAnswers = {3, -2879.167, 11.003, 40, 161.622,
+                                77, 496.792, 20.082, 0, 2939.288,
+                                4.0, 3.081, 2157.788, 66.865, 0,
+                                -5.336, 124.261, 23.064, 10.435, 2.346,
+                                14.313};
+   }
 
 }
