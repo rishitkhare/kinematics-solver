@@ -11,8 +11,11 @@ public class Algebra {
       return Math.abs(leftSide.evaluate() - rightSide.evaluate()) < 0.000000001;
    }
 
-   public static boolean isEqualTestEquation(double leftSide, double rightSide) {
-      return Math.abs(leftSide - rightSide) < 0.001;
+   public static boolean isEqualTestEquation(double actual, double expected) {
+      if (actual == expected) {
+         return true;
+      }
+      return Math.abs((actual - expected) / expected) < 1; // Less than 1% error
    }
 
    // checks if a String can be parsed as Double
@@ -104,8 +107,8 @@ public class Algebra {
          }
 
          showYourWork.addStep(leftSide + " = " + rightSide.evaluate());
-         showYourWork.setAnswer(rightSide.evaluate());
       }
+      showYourWork.setAnswer(rightSide.evaluate());
 
       //If we are solving for time, the answer cannot be negative
 
@@ -126,6 +129,7 @@ public class Algebra {
       Arrays.sort(roots);
       if (roots[1] > 0) {
          showYourWork.addStep("Δt = " + roots[1]);
+         showYourWork.setAnswer(roots[1]);
       }
       else {
          throw new IllegalArgumentException("ERROR: Both values for possible time are negative");

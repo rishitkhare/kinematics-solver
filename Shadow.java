@@ -25,6 +25,6 @@ public class Shadow extends KinematicEquation {
          Algebra.solveEquation(false, this.work, leftSide, rightSide, getMissingQuantityIndex());
       }
 
-      setQuantity(getMissingQuantityIndex(), this.work.getNumericalAnswer()); //adds answer to array and updates knowns
+      setQuantity(getMissingQuantityIndex(), Double.toString(this.work.getNumericalAnswer())); //adds answer to array and updates knowns
    }
 }

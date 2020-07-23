@@ -4,7 +4,7 @@ import java.util.*;
 
 public class Steps {
     private ArrayList<String> steps;
-    private double answer;
+    private double answer = Double.MAX_VALUE;
 
     //constructor starts with the unchanged equation
     public Steps(String baseEquation) {
@@ -38,7 +38,7 @@ public class Steps {
     }
 
     //gets the answer but as a parsable double
-    public String getNumericalAnswer() { return Double.toString(this.answer); }
+    public double getNumericalAnswer() { return this.answer; }
 
     public void setAnswer(double answer) { this.answer = answer; }
 }

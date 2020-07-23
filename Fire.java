@@ -22,6 +22,6 @@ public class Fire extends KinematicEquation {
       setWork(new Steps(equation));
       Algebra.solveEquation(false, this.work, leftSide, rightSide, getMissingQuantityIndex());
 
-      setQuantity(getMissingQuantityIndex(), this.work.getNumericalAnswer()); //adds answer to array and updates knowns
+      setQuantity(getMissingQuantityIndex(), Double.toString(this.work.getNumericalAnswer())); //adds answer to array and updates knowns
    }
 }

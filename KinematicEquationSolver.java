@@ -318,6 +318,11 @@ public class KinematicEquationSolver {
    public static void runTests() {
 
       int count = 0;
+      double [] testsAnswers = {3, -2879.167, 11.003, 40, 161.622,
+                                77, 496.792, 20.095, 0, 2939.288,
+                                4.0, 3080512.832, 2157.788, 66.865, 0,
+                                -5.336, 124.261, 23.064, 10.435, 2.346,
+                                14.313};
 
       File testFile = new File("TestCases.txt");
       try {
@@ -326,15 +331,18 @@ public class KinematicEquationSolver {
       catch (FileNotFoundException ex) { }
       int testIndex = 0;
       while (scan.hasNextLine()) {
-         if (processInput(scan.nextLine()).getNumericalAnswer() == testsAnswers[testIndex])
+         Steps testWork = processInput(scan.nextLine());
+         if (Algebra.isEqualTestEquation(testWork.getNumericalAnswer(), testsAnswers[testIndex])) {
+            count++;
+         }
+         else {
+            System.out.println("Test Case Failed: ");
+            System.out.println("Computer value: " + testWork.getNumericalAnswer());
+            System.out.println("Human value: " + testsAnswers[testIndex]);
+         }
          scan.nextLine();
+         testIndex++;
       }
-
-      double [] testsAnswers = {3, -2879.167, 11.003, 40, 161.622,
-                                77, 496.792, 20.082, 0, 2939.288,
-                                4.0, 3.081, 2157.788, 66.865, 0,
-                                -5.336, 124.261, 23.064, 10.435, 2.346,
-                                14.313};
+      System.out.println("You passed " + count + "/" + testsAnswers.length + " test cases. You suck!");
    }
-
 }

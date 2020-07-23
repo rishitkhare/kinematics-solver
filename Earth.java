@@ -25,6 +25,6 @@ public class Earth extends KinematicEquation {
          Algebra.solveEquation(true, this.work, this.leftSide, this.rightSide, getMissingQuantityIndex());
       }
 
-      setQuantity(getMissingQuantityIndex(), this.work.getNumericalAnswer()); //adds answer to array and updates knowns
+      setQuantity(getMissingQuantityIndex(), Double.toString(this.work.getNumericalAnswer())); //adds answer to array and updates knowns
    }
 }
