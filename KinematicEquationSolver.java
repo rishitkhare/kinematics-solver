@@ -27,7 +27,6 @@ public class KinematicEquationSolver {
    //main method
    public static void main(String[] args) {
       //prints out information for the user
-      runTests();
       scan = new Scanner(System.in);
       printWelcomeMessage();
       printEmptyLine();
@@ -36,6 +35,14 @@ public class KinematicEquationSolver {
 
       //input loop that continues to ask for kinematics problems until user types "quit"
       String input = getEquationInput(true);
+      if (input.equalsIgnoreCase("test")) {
+         try {
+            scan = new Scanner(new File("TestCases.txt"));
+         }
+         catch (FileNotFoundException ex) { }
+         runTests();
+         System.exit(0);
+      }
       while (! input.equalsIgnoreCase("quit")) {
          if (! input.equalsIgnoreCase("quit")) {
             Steps solution = processInput(input);
@@ -321,14 +328,8 @@ public class KinematicEquationSolver {
       double [] testsAnswers = {3, -2879.167, 11.003, 40, 161.622,
                                 77, 496.792, 20.095, 0, 2939.288,
                                 4.0, 3080512.832, 2157.788, 66.865, 0,
-                                -5.336, 124.261, 23.064, 10.435, 2.346,
+                                -5.336, 124.261, 2294.36, 10.435, 2.346,
                                 14.313};
-
-      File testFile = new File("TestCases.txt");
-      try {
-         scan = new Scanner(new File("TestCases.txt"));
-      }
-      catch (FileNotFoundException ex) { }
       int testIndex = 0;
       while (scan.hasNextLine()) {
          Steps testWork = processInput(scan.nextLine());
@@ -343,6 +344,6 @@ public class KinematicEquationSolver {
          scan.nextLine();
          testIndex++;
       }
-      System.out.println("You passed " + count + "/" + testsAnswers.length + " test cases. You suck!");
+      System.out.println("You passed " + count + "/" + testsAnswers.length + " test cases.");
    }
 }
