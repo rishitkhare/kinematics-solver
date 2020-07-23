@@ -26,22 +26,23 @@ public class KinematicEquationSolver {
    //main method
    public static void main(String[] args) {
       //prints out information for the user
-      printWelcomeMessage();
-      printEmptyLine();
-      printKinematicEquations();
-      printEmptyLine();
-
-      //input loop that continues to ask for kinematics problems until user types "quit"
-      String input = getEquationInput(true);
-      while (! input.equalsIgnoreCase("quit")) {
-         if (! input.equalsIgnoreCase("quit")) {
-            processInput(input);   
-         }
-         input = getEquationInput(false);
-      }
-
-
-      printGoodbyeMessage();
+      runTests();
+//      printWelcomeMessage();
+//      printEmptyLine();
+//      printKinematicEquations();
+//      printEmptyLine();
+//
+//      //input loop that continues to ask for kinematics problems until user types "quit"
+//      String input = getEquationInput(true);
+//      while (! input.equalsIgnoreCase("quit")) {
+//         if (! input.equalsIgnoreCase("quit")) {
+//            processInput(input);
+//         }
+//         input = getEquationInput(false);
+//      }
+//
+//
+//      printGoodbyeMessage();
    }
 
    public static void printEmptyLine() {
@@ -284,6 +285,24 @@ public class KinematicEquationSolver {
       }
    }
 
+   public static void setQuantity(String[] quantities, boolean[] knowns, int quantityIndex, String quantity) {
+      String[] terms = quantity.split(" ");
+      if (! quantity.equalsIgnoreCase("?")) {
+         knowns[quantityIndex] = true;
+         if (Algebra.isNumber(terms[0])) {
+            if (terms.length == 1) {
+               quantities[quantityIndex] = terms[0].toString();
+            }
+            else {
+               if (quantityIndex == 0) {
+                  quantityIndex = 1;
+               }
+               quantities[quantityIndex] = Double.toString(Double.parseDouble(terms[0]) * UnitConversion.unitToConversionFactor(terms[1], quantityIndex));
+            }
+         }
+      }
+   }
+
    public static boolean know3SharedValues(boolean[] knowns1, boolean[] knowns2) {
       // Assuming that knowns1.length = knowns2.length = 5
       int count = 0;
@@ -295,5 +314,41 @@ public class KinematicEquationSolver {
 
       return count == 3;
    }
+
+//   public static void runTests() {
+//      int count = 0;
+//      // Vf = Vi + aΔt
+//      String[] quantities = {"Vi", "Vf", "Δt", "a", "ΔX"};
+//      boolean[] knowns = new boolean[5];
+//
+//      String[][] earthTests =  { {"12", "6", "2", "?", "3.0"},
+//                                               {"3 km/hr", "?", "4 m/s^2", "12 min", "-2879.167"},
+//                                               {"?", "11 m/s", "40 km/hr^2", "1s", "11.003"},
+//                                               {"214", "114 m/s", "?", "2.5 s", "40"},
+//                                               {"12 km/min", "171 yd/s", "?", "270 ms", "161.622"} };
+//      for (int row = 0; row < earthTests.length; row++) {
+//         for (int col = 0; col < earthTests[row].length - 1; col++) {
+//            setQuantity(quantities, knowns, EQUATION_ASK_ORDER[0][col], earthTests[row][col]);
+//         }
+//         Earth earthTest = new Earth(knowns, quantities);
+//         earthTest.doAlgebra();
+//         if (Algebra.isEqualTestEquation(Double.parseDouble(earthTest.getWork().getNumericalAnswer()), Double.parseDouble(earthTests[row][4]))) {
+//            count++;
+//         }
+//         else {
+//            System.out.println("ERROR: Failed test case");
+//            System.out.println("Computer generated answer: " + earthTest.getWork().getNumericalAnswer());
+//            System.out.println("Human generated answer: " + earthTests[row][4]);
+//         }
+//      }
+//      System.out.println("You passed " + count + " out of 5 cases. You suck!");
+//      // ΔX = 1/2(Vf + Vi)Δt
+//      String[][] waterTests =  { {"24 m", "?", "19 m/s", "0.5", "77"},
+//                                 {"?", "109 cm/s", "21 km/min", "283 jiffy", "496.792"},
+//                                 {"41 km", "22 cbl/s", "0.23 mi/min", "?", "20.082"},
+//                                 {"?", "9 m/s", "0", "0 s", "0"},
+//                                 {"12 mi", "11 in/ms", "?", "12 s", "2939.288"} };
+//
+//   }
 
 }

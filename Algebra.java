@@ -8,7 +8,11 @@ public class Algebra {
    private Algebra() {}
 
    public static boolean isEqualEquation(Expression leftSide, Expression rightSide) {
-      return leftSide.evaluate() == rightSide.evaluate();
+      return Math.abs(leftSide.evaluate() - rightSide.evaluate()) < 0.000000001;
+   }
+
+   public static boolean isEqualTestEquation(double leftSide, double rightSide) {
+      return Math.abs(leftSide - rightSide) < 0.001;
    }
 
    // checks if a String can be parsed as Double
